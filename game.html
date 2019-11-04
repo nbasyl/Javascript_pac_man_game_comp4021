@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>SVG Game</title>
+  <script language="JavaScript" src="game.js"></script>
+</head>
+
+<body style="text-align: center" onload="load();">
+<svg width="800px" height="600px"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:a="http://www.adobe.com/svg10-extensions" a:timeline="independent">
+
+  <defs>
+    <clipPath id="gameareaclip">
+      <rect x="20" y="20" width="600" height="560"/>
+    </clipPath>
+    <pattern id="background_pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" style="fill:rgb(70, 54, 134)"/>
+      <circle cx="10" cy="10" r="8" style="fill:rgb(69, 53, 129)"/>
+    </pattern>
+    <radialGradient id="player_color">
+      <stop offset="0.0" style="stop-color:rgb(92, 62, 212);stop-opacity:1"/>
+      <stop offset="0.8" style="stop-color:rgb(87, 58, 202);stop-opacity:1"/>
+      <stop offset="1.0" style="stop-color:rgb(175, 164, 219);stop-opacity:1"/>
+    </radialGradient>
+	<g id="monster">
+	  <path d="M0,30 q0,-30 20,-30 t20,30 l0,10
+			   l-5,-7 l-5,7 l-5,-7 l-5,7 l-5,-7 l-5,7 l-5,-7 l-5,7 l0,-10"
+			style="fill:gray;fill-opacity:0.5;stroke:black;stroke-width:2"/>
+	  <circle cx="12" cy="20" r="5"
+			  style="fill:yellow;stroke:black;stroke-width:2">
+		<animateColor attributeName="fill" values="yellow;red;yellow"
+					  dur="1s" repeatCount="indefinite"/>
+	  </circle>
+	  <circle cx="28" cy="20" r="5"
+			  style="fill:yellow;stroke:black;stroke-width:2">
+		<animateColor attributeName="fill" values="yellow;red;yellow"
+					  dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <!-- <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="190.21385906037492 103.06200712000441 44.00000000000003 62.369999999999976" width="40" height="58.37"><defs></defs><path d="M224.52 142.86C228.21 142.89 231.21 142.08 231.21 141.05C231.22 140.02 228.24 139.16 224.55 139.14C220.86 139.11 217.87 139.92 212.24 140.91C217.85 141.98 220.84 142.84 224.52 142.86Z" id="a6icexyjtb"></path><path d="M191.21 123.87C191.21 114.09 199.97 106.17 210.78 106.17C221.59 106.17 230.35 114.09 230.35 123.87C230.35 133.64 221.59 141.57 210.78 156.48C199.97 141.57 191.21 133.64 191.21 123.87Z" id="a2DtKcSIvN"></path><path d="M208.81 122.36L208.81 122.36L211.1 120.47L215.34 123.97L213.05 125.86L211.1 124.25L205.29 129.06L203 127.17L208.81 122.36Z" id="a1H2PSObGA"></path><path d="M219.06 123.13L219.06 123.13L216.16 121.24L210.78 124.74L213.68 126.63L216.16 125.02L223.53 129.82L226.44 127.93L219.06 123.13Z" id="c76K9I4xn"></path><path d="M220.29 112.13L216.52 115.95L218.63 118.09L222.41 114.27L226.18 118.09L228.29 115.95L224.52 112.13L228.29 108.31L226.18 106.17L222.41 109.99L218.63 106.17L216.52 108.31L220.29 112.13Z" id="bvMeacQyb"></path><path d="M201.74 111.08L197.78 115.57L200 118.09L203.95 113.59L207.9 118.09L210.12 115.57L206.16 111.08L210.12 106.58L207.9 104.06L203.95 108.56L200 104.06L197.78 106.58L201.74 111.08Z" id="eeF8J6JBL"></path><path d="M209.13 158.62C211.83 155.78 211.37 150.92 208.09 147.77C204.81 144.63 199.96 144.39 197.26 147.24C194.55 150.08 195.02 154.94 194.17 162.43C201.57 161.23 206.42 161.47 209.13 158.62Z" id="h26FxGHmlM"></path><path d="M193.46 143.43C193.61 145.6 196.36 147.17 199.6 146.94C199.73 146.93 199.85 146.92 199.97 146.9C200.57 148.43 202.3 149.46 204.27 149.32C204.27 149.32 204.27 149.32 204.27 149.32C206.61 149.15 208.4 147.36 208.26 145.32C208.19 144.4 207.66 136.99 207.59 136.06C207.45 134.02 205.43 132.51 203.08 132.67C203.08 132.67 203.08 132.67 203.08 132.67C201.03 132.82 199.41 134.2 199.12 135.91C196.91 136.22 195.27 137.59 195.38 139.12C195.4 139.46 195.51 139.77 195.68 140.06C194.25 140.88 193.36 142.12 193.46 143.43Z" id="gltDbEbTb"></path><path d="M219.75 145.77C223.43 145.8 226.43 144.98 226.44 143.96C226.44 142.93 223.46 142.07 219.77 142.04C216.08 142.02 213.09 142.83 207.46 143.82C213.07 144.89 216.06 145.74 219.75 145.77Z" id="c2eGSjQ0oA"></path></defs><g><g><use xlink:href="#a6icexyjtb" opacity="0.42" fill="#645eb5" fill-opacity="1"></use></g><g><use xlink:href="#a2DtKcSIvN" opacity="1" fill="#645eb5" fill-opacity="1"></use></g><g><use xlink:href="#a1H2PSObGA" opacity="1" fill="#a62282" fill-opacity="1"></use></g><g><use xlink:href="#c76K9I4xn" opacity="1" fill="#a62282" fill-opacity="1"></use></g><g><use xlink:href="#bvMeacQyb" opacity="1" fill="#85620f" fill-opacity="1"></use></g><g><use xlink:href="#eeF8J6JBL" opacity="1" fill="#06cca6" fill-opacity="1"></use></g><g><use xlink:href="#h26FxGHmlM" opacity="1" fill="#5d58ad" fill-opacity="1"></use></g><g><use xlink:href="#gltDbEbTb" opacity="1" fill="#5d58ad" fill-opacity="1"></use></g><g><use xlink:href="#c2eGSjQ0oA" opacity="0.97" fill="#9f9db0" fill-opacity="1"></use></g></g></svg> -->
+  </g>
+  <g id="coin">
+     <image xlink:href="resources/coin.png" height="20" width="20"/>
+  </g>
+	<g id="bullet">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="144.62306434088325 113.03846153846158 34 34.400000000000006" width="30" height="30.4"><defs><path d="M158.68 119.77L156.77 125.49L160.59 125.49L164.41 125.49L162.5 119.77L160.59 114.04L158.68 119.77Z" id="dXA6a3F5t"></path><path d="M151.4 131.31L157.17 133.08L157.08 129.26L156.98 125.44L151.3 127.49L145.62 129.55L151.4 131.31Z" id="bfVHNcMeG"></path><path d="M162.6 138.68L164.41 132.92L160.59 132.99L156.77 133.05L158.78 138.75L160.79 144.44L162.6 138.68Z" id="g1nOsVP87"></path><path d="M169.82 126.96L164.02 125.29L164.18 129.11L164.34 132.92L169.98 130.77L175.62 128.62L169.82 126.96Z" id="b2mmepliu1"></path><path d="M156.77 125.14L164.41 125.14L164.41 133.08L156.77 133.08L156.77 125.14Z" id="bq4CgklUC"></path><path d="M163.55 129.36C163.55 130.72 162.29 131.82 160.73 131.82C159.18 131.82 157.92 130.72 157.92 129.36C157.92 128 159.18 126.9 160.73 126.9C162.29 126.9 163.55 128 163.55 129.36Z" id="a4ktfuziuM"></path><path d="M147.67 129.71L148.97 129.71L150.28 129.71L151.59 129.71L152.89 129.71L154.2 129.81L155.51 129.81L156.81 129.91" id="gv4Aodzkz"></path><path d="M160.73 114.74L160.73 116.35L160.73 118.06L160.73 119.36L160.73 120.77L160.63 122.18L160.63 123.48L160.53 124.79" id="b6XgcwJM5X"></path><path d="M164.85 129.11L166.26 129.11L167.67 129.11L168.97 129.11L170.48 129.11L171.79 129.01L173.09 129.01L174.4 128.81" id="bOSuwW6Zh"></path><path d="M160.63 133.53L160.63 134.94L160.63 136.75L160.63 138.15L160.73 139.56L160.83 140.97L160.93 142.27L160.73 143.58" id="a2mDuHfvrq"></path></defs><g><g><use xlink:href="#dXA6a3F5t" opacity="1" fill="#404550" fill-opacity="1"></use></g><g><use xlink:href="#bfVHNcMeG" opacity="1" fill="#404550" fill-opacity="1"></use></g><g><use xlink:href="#g1nOsVP87" opacity="1" fill="#404550" fill-opacity="1"></use></g><g><use xlink:href="#b2mmepliu1" opacity="1" fill="#404550" fill-opacity="1"></use></g><g><use xlink:href="#bq4CgklUC" opacity="1" fill="#404550" fill-opacity="1"></use></g><g><use xlink:href="#a4ktfuziuM" opacity="1" fill="#000000" fill-opacity="1"></use></g><g><g><use xlink:href="#gv4Aodzkz" opacity="1" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"></use></g></g><g><g><use xlink:href="#b6XgcwJM5X" opacity="1" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"></use></g></g><g><g><use xlink:href="#bOSuwW6Zh" opacity="1" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"></use></g></g><g><g><use xlink:href="#a2mDuHfvrq" opacity="1" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"></use></g></g></g></svg>
+	  <!-- <circle cx="5" cy="5" r="5" style="fill:red"/> 
+    <circle cx="6" cy="3" r="1" style="fill:pink"/>      -->
+      <!-- <image xlink:href="resources/bullet.png" height="0" width="30"/> -->
+  </g>
+  <g id="monster_attack">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="129.84586210746556 265.0275097460043 43.99999999999997 10.620000000000005" width="40" height="6.62"><defs><path d="M156.8 266.03C164.58 266.1 170.86 267.64 170.85 269.47C170.83 271.3 164.51 272.72 156.74 272.64C148.97 272.57 142.68 271.03 130.85 269.09C142.72 267.38 149.03 265.96 156.8 266.03Z" id="c3nKuP47Xi"></path><path d="M167.91 269.06C167.91 270.08 163.45 270.9 157.95 270.9C152.46 270.9 148 270.08 148 269.06C148 268.04 152.46 267.22 157.95 267.22C163.45 267.22 167.91 268.04 167.91 269.06Z" id="a2hqXa3hm"></path></defs><g><g><use xlink:href="#c3nKuP47Xi" opacity="1" fill="#e44d79" fill-opacity="1"></use></g><g><use xlink:href="#a2hqXa3hm" opacity="1" fill="#100314" fill-opacity="1"></use></g></g></svg>
+  </g>
+  
+  </defs>
+
+  <rect width="100%" height="100%" style="fill:url(#background_pattern);stroke:purple;stroke-width:4" />
+
+  <rect x="20" y="20" width="600" height="560" style="fill:black;stroke:rgb(37, 15, 15);stroke-width:5" />
+
+  <!-- Add your button here -->
+
+  <g style="clip-path:url(#gameareaclip)">
+    <g transform="translate(20,20)">
+      <g id="gamearea" transform="translate(0,0)" width="600" height="560">
+        <rect x="0" y="0" width="600" height="560" style="fill:white" />
+		<g id="coins"/>
+		<g id="monsters"/>
+		<g id="bullets"/>
+    <g id="monster_attacks"/>
+      <g id="platforms">
+          <!-- Add your platforms here -->
+            <rect id ="moving_plat" style="fill:purple" width="80" height="20" x="520" y="100">
+              <animate attributeName="y" attributeType="XML" dur="20s" values="100;520;100" repeatCount="indefinite"/>
+            </rect>
+            <!-- 60 -->
+            <rect style="fill:purple" width="60" height="20" x="0" y="60"/>
+
+            <!-- 80 -->
+            <rect style="fill:purple" width="20" height="20" x="40" y="80"/>
+
+            <!-- 100 -->
+            <rect style="fill:purple" width="480" height="20" x="40" y="100"/>
+
+            <!-- 120 -->
+            <!-- <rect style="fill:purple" width="20" height="20" x="60" y="120"/> -->
+            <!-- <rect style="fill:purple" width="40" height="20" x="220" y="120"/> -->
+
+            <!-- 140 -->
+            <!-- <rect style="fill:purple" width="40" height="20" x="220" y="140"/> -->
+            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="140"/> -->
+
+            <!-- 160 -->
+            <rect class="disappear" style="fill:rgb(65, 16, 65)" width="120" height="20" x="180" y="160"/>
+            <!-- <rect style="fill:purple" width="60" height="20" x="540" y="160"/> -->
+
+            <!-- 180 -->
+            <!-- <rect style="fill:purple" width="20" height="20" x="0" y="180"/> -->
+            <rect style="fill:purple" width="20" height="20" x="100" y="180"/>
+            <rect style="fill:purple" width="20" height="20" x="380" y="180"/>
+            <!-- <rect style="fill:purple" width="80" height="20" x="520" y="180"/> -->
+
+            <!-- 200 -->
+            <!-- <rect style="fill:purple" width="20" height="20" x="0" y="200"/> -->
+            <rect style="fill:purple" width="40" height="20" x="80" y="200"/>
+            <rect style="fill:purple" width="80" height="20" x="360" y="200"/>
+
+            <!-- 220 -->
+            <rect style="fill:purple" width="160" height="20" x="0" y="220"/>
+            <rect style="fill:purple" width="140" height="20" x="320" y="220"/>
+
+            <!-- 240 -->
+            <!-- <rect style="fill:purple" width="20" height="20" x="240" y="240"/> -->
+            <rect class="disappear" style="fill:rgb(65, 16, 65)" width="160" height="20" x="340" y="240"/>
+
+            <!-- 260 -->
+            <rect style="fill:purple" width="60" height="20" x="220" y="260"/>
+
+            <!-- 280 -->
+            <rect style="fill:purple" width="100" height="20" x="200" y="280"/>
+            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="280"/> -->
+
+            <!-- 300 -->
+            <rect style="fill:purple" width="100" height="20" x="120" y="300"/>
+            <rect style="fill:purple" width="40" height="20" x="280" y="300"/>
+            <!-- <rect style="fill:purple" width="100" height="20" x="500" y="300"/> -->
+
+            <!-- 320 -->
+            <rect style="fill:purple" width="40" height="20" x="0" y="320"/>
+            <rect style="fill:purple" width="60" height="20" x="280" y="320"/>
+            <rect style="fill:purple" width="20" height="20" x="380" y="320"/>
+
+            <!-- 340 -->
+            <rect style="fill:purple" width="60" height="20" x="0" y="340"/>
+            <rect style="fill:purple" width="20" height="20" x="320" y="340"/>
+            <rect style="fill:purple" width="20" height="20" x="380" y="340"/>
+
+            <!-- 360 -->
+            <rect style="fill:purple" width="120" height="20" x="0" y="360"/>
+            <rect style="fill:purple" width="20" height="20" x="320" y="360"/>
+            <rect style="fill:purple" width="120" height="20" x="380" y="360"/>
+
+            <!-- 380 -->
+            <rect style="fill:purple" width="100" height="20" x="0" y="380"/>
+            <rect style="fill:purple" width="20" height="20" x="220" y="380"/>
+            <!-- <rect style="fill:purple" width="20" height="20" x="580" y="380"/> -->
+
+            <!-- 400 -->
+            <rect style="fill:purple" width="80" height="20" x="180" y="400"/>
+            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="400"/> -->
+
+            <!-- 420 -->
+            <rect style="fill:purple" width="200" height="20" x="160" y="420"/>
+            <!-- <rect style="fill:purple" width="60" height="20" x="540" y="420"/> -->
+
+            <!-- 440 -->
+            <rect style="fill:purple" width="100" height="20" x="140" y="440"/>
+            <rect style="fill:purple" width="20" height="20" x="440" y="440"/>
+            <!-- <rect style="fill:purple" width="60" height="20" x="500" y="440"/> -->
+
+            <!-- 460 -->
+            <rect style="fill:purple" width="60" height="20" x="120" y="460"/>
+            <rect style="fill:purple" width="60" height="20" x="400" y="460"/>
+
+            <!-- 480 -->
+            <rect style="fill:purple" width="40" height="20" x="0" y="480"/>
+            <rect style="fill:purple" width="60" height="20" x="380" y="480"/>
+
+            <!-- 500 -->
+            <rect style="fill:purple" width="60" height="20" x="0" y="500"/>
+            <rect style="fill:purple" width="20" height="20" x="260" y="500"/>
+
+            <!-- 520 -->
+            <rect style="fill:purple" width="80" height="20" x="0" y="520"/>
+            <!-- <rect style="fill:purple" width="20" height="20" x="140" y="520"/> -->
+            <rect style="fill:purple" width="80" height="20" x="240" y="520"/>
+            <!-- <rect style="fill:purple" width="20" height="20" x="500" y="520"/> -->
+
+            <!-- the floor -->
+            <rect style="fill:purple" width="600" height="20" x="0" y="540"/>
+        </g>
+
+        <g id="player">
+          <circle cx="20" cy="20" r="20" style="fill:url(#player_color);stroke:black;stroke-width:2"/>
+          <ellipse cx="15" cy="15" rx="3" ry="6" style="fill:black"/>
+          <ellipse cx="25" cy="15" rx="3" ry="6" style="fill:black"/>
+          <path d="M10,25 l20,0 q0,8 -10,8 t-10,-8" style="fill:purple;stroke:black;stroke-black:2"/>
+          <!-- <image xlink:href="resources/charcter.png" height="40" width="40"/> -->
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
+</body>
+
+</html>
