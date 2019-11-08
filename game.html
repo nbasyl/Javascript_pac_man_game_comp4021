@@ -5,7 +5,14 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>SVG Game</title>
+  <audio id="kill" src="resources/kill.wav" preload="auto"></audio>
+  <audio id="lose" src="resources/lose.wav" preload="auto"></audio>
+  <audio id="win" src="resources/win.wav" preload="auto"></audio>
+  <audio id="shoot" src="resources/shoot.wav" preload="auto"></audio>
+  <audio id="background_music" src="resources/background.mp3" preload="auto"></audio>
+  <audio id="coin_sound" src="resources/coin.mp3" preload="auto"></audio>
   <script language="JavaScript" src="game.js"></script>
+  <script language="JavaScript" src="highscore.js"></script>
 </head>
 
 <body style="text-align: center" onload="load();">
@@ -16,6 +23,14 @@
      xmlns:a="http://www.adobe.com/svg10-extensions" a:timeline="independent">
 
   <defs>
+    <clipPath id="start_game">
+      <rect x="0" y="0" width="0" height="0">
+        <animate id="effect" attributeName="x" attributeType="XML" values="400;0" begin="button.click" dur="1s" fill="freeze"/>
+        <animate attributeName="y" attributeType="XML" values="300;0" begin="effect.begin" dur="1s" fill="freeze"/>
+        <animate attributeName="width" attributeType="XML" values="0;800" begin="effect.begin" dur="1s" fill="freeze"/>
+        <animate attributeName="height" attributeType="XML" values="0;600" begin="effect.begin" dur="1s" fill="freeze"/>
+      </rect>
+    </clipPath>
     <clipPath id="gameareaclip">
       <rect x="20" y="20" width="600" height="560"/>
     </clipPath>
@@ -44,145 +59,225 @@
   <g id="monster_attack">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="129.84586210746556 265.0275097460043 43.99999999999997 10.620000000000005" width="40" height="6.62"><defs><path d="M156.8 266.03C164.58 266.1 170.86 267.64 170.85 269.47C170.83 271.3 164.51 272.72 156.74 272.64C148.97 272.57 142.68 271.03 130.85 269.09C142.72 267.38 149.03 265.96 156.8 266.03Z" id="c3nKuP47Xi"></path><path d="M167.91 269.06C167.91 270.08 163.45 270.9 157.95 270.9C152.46 270.9 148 270.08 148 269.06C148 268.04 152.46 267.22 157.95 267.22C163.45 267.22 167.91 268.04 167.91 269.06Z" id="a2hqXa3hm"></path></defs><g><g><use xlink:href="#c3nKuP47Xi" opacity="1" fill="#e44d79" fill-opacity="1"></use></g><g><use xlink:href="#a2hqXa3hm" opacity="1" fill="#100314" fill-opacity="1"></use></g></g></svg>
   </g>
+  <g id="name">
+		<text id="name_value" x="16" y="0" style="fill:rgb(0, 0, 0);font-size:16px;text-anchor:middle;font-family: monospace">SeanThePlug's fan</text>
+  </g>
   
   </defs>
 
-  <rect width="100%" height="100%" style="fill:url(#background_pattern);stroke:purple;stroke-width:4" />
+  <rect width="100%" height="100%" style="fill:url(#background_pattern);stroke:rgb(255, 170, 0);stroke-width:4" />
 
   <rect x="20" y="20" width="600" height="560" style="fill:black;stroke:rgb(37, 15, 15);stroke-width:5" />
 
   <!-- Add your button here -->
-
-  <g style="clip-path:url(#gameareaclip)">
-    <g transform="translate(20,20)">
-      <g id="gamearea" transform="translate(0,0)" width="600" height="560">
-        <rect x="0" y="0" width="600" height="560" style="fill:white" />
-      <g id="platforms">
-          <!-- Add your platforms here -->
-            <rect id ="moving_plat" style="fill:purple" width="80" height="20" x="520" y="100">
-            </rect>
-            <!-- 60 -->
-            <rect style="fill:purple" width="60" height="20" x="0" y="60"/>
-
-            <!-- 80 -->
-            <rect style="fill:purple" width="20" height="20" x="40" y="80"/>
-
-            <!-- 100 -->
-            <rect style="fill:purple" width="480" height="20" x="40" y="100"/>
-
-            <!-- 120 -->
-            <!-- <rect style="fill:purple" width="20" height="20" x="60" y="120"/> -->
-            <!-- <rect style="fill:purple" width="40" height="20" x="220" y="120"/> -->
-
-            <!-- 140 -->
-            <!-- <rect style="fill:purple" width="40" height="20" x="220" y="140"/> -->
-            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="140"/> -->
-
-            <!-- 160 -->
-            <rect class="disappear" style="fill:rgb(65, 16, 65)" width="120" height="20" x="180" y="160"/>
-            <!-- <rect style="fill:purple" width="60" height="20" x="540" y="160"/> -->
-
-            <!-- 180 -->
-            <!-- <rect style="fill:purple" width="20" height="20" x="0" y="180"/> -->
-            <rect style="fill:purple" width="20" height="20" x="100" y="180"/>
-            <rect style="fill:purple" width="20" height="20" x="380" y="180"/>
-            <!-- <rect style="fill:purple" width="80" height="20" x="520" y="180"/> -->
-
-            <!-- 200 -->
-            <!-- <rect style="fill:purple" width="20" height="20" x="0" y="200"/> -->
-            <rect style="fill:purple" width="40" height="20" x="80" y="200"/>
-            <rect style="fill:purple" width="80" height="20" x="360" y="200"/>
-
-            <!-- 220 -->
-            <rect style="fill:purple" width="160" height="20" x="0" y="220"/>
-            <rect style="fill:purple" width="140" height="20" x="320" y="220"/>
-
-            <!-- 240 -->
-            <!-- <rect style="fill:purple" width="20" height="20" x="240" y="240"/> -->
-            <rect class="disappear" style="fill:rgb(65, 16, 65)" width="160" height="20" x="340" y="240"/>
-
-            <!-- 260 -->
-            <rect style="fill:purple" width="60" height="20" x="220" y="260"/>
-
-            <!-- 280 -->
-            <rect style="fill:purple" width="100" height="20" x="200" y="280"/>
-            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="280"/> -->
-
-            <!-- 300 -->
-            <rect style="fill:purple" width="100" height="20" x="120" y="300"/>
-            <rect style="fill:purple" width="40" height="20" x="280" y="300"/>
-            <!-- <rect style="fill:purple" width="100" height="20" x="500" y="300"/> -->
-
-            <!-- 320 -->
-            <rect style="fill:purple" width="40" height="20" x="0" y="320"/>
-            <rect style="fill:purple" width="60" height="20" x="280" y="320"/>
-            <rect style="fill:purple" width="20" height="20" x="380" y="320"/>
-
-            <!-- 340 -->
-            <rect style="fill:purple" width="60" height="20" x="0" y="340"/>
-            <rect style="fill:purple" width="20" height="20" x="320" y="340"/>
-            <rect style="fill:purple" width="20" height="20" x="380" y="340"/>
-
-            <!-- 360 -->
-            <rect style="fill:purple" width="120" height="20" x="0" y="360"/>
-            <rect style="fill:purple" width="20" height="20" x="320" y="360"/>
-            <rect style="fill:purple" width="120" height="20" x="380" y="360"/>
-
-            <!-- 380 -->
-            <rect style="fill:purple" width="100" height="20" x="0" y="380"/>
-            <rect style="fill:purple" width="20" height="20" x="220" y="380"/>
-            <!-- <rect style="fill:purple" width="20" height="20" x="580" y="380"/> -->
-
-            <!-- 400 -->
-            <rect style="fill:purple" width="80" height="20" x="180" y="400"/>
-            <!-- <rect style="fill:purple" width="40" height="20" x="560" y="400"/> -->
-
-            <!-- 420 -->
-            <rect style="fill:purple" width="200" height="20" x="160" y="420"/>
-            <!-- <rect style="fill:purple" width="60" height="20" x="540" y="420"/> -->
-
-            <!-- 440 -->
-            <rect style="fill:purple" width="100" height="20" x="140" y="440"/>
-            <rect style="fill:purple" width="20" height="20" x="440" y="440"/>
-            <!-- <rect style="fill:purple" width="60" height="20" x="500" y="440"/> -->
-
-            <!-- 460 -->
-            <rect style="fill:purple" width="60" height="20" x="120" y="460"/>
-            <rect style="fill:purple" width="60" height="20" x="400" y="460"/>
-
-            <!-- 480 -->
-            <rect style="fill:purple" width="40" height="20" x="0" y="480"/>
-            <rect style="fill:purple" width="60" height="20" x="380" y="480"/>
-
-            <!-- 500 -->
-            <rect style="fill:purple" width="60" height="20" x="0" y="500"/>
-            <rect style="fill:purple" width="20" height="20" x="260" y="500"/>
-
-            <!-- 520 -->
-            <rect style="fill:purple" width="80" height="20" x="0" y="520"/>
-            <!-- <rect style="fill:purple" width="20" height="20" x="140" y="520"/> -->
-            <rect style="fill:purple" width="80" height="20" x="240" y="520"/>
-            <!-- <rect style="fill:purple" width="20" height="20" x="500" y="520"/> -->
-
-            <!-- the floor -->
-            <rect style="fill:purple" width="600" height="20" x="0" y="540"/>
-        </g>
-        <svg x="510", y ="-10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="119.81967213114747 74.32786885245892 103.99999999999999 12.984615384615381" width="100" height="30.98"><defs><path d="M220.82 79.82C220.82 82.3 198.42 84.31 170.82 84.31C143.22 84.31 120.82 82.3 120.82 79.82C120.82 77.34 143.22 75.33 170.82 75.33C198.42 75.33 220.82 77.34 220.82 79.82Z" id="bDjtJjUKg"></path></defs><g><g><use xlink:href="#bDjtJjUKg" opacity="1" fill="#29e37f" fill-opacity="1"></use></g></g></svg>
-        <svg x="-5", y="390" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="174.33653846153845 86.47596153846155 40.77884615384616 182.99038461538464" width="19.52" height="95"><defs><path d="M212.12 176.97C212.12 226.36 203.88 266.47 193.73 266.47C183.58 266.47 175.34 226.36 175.34 176.97C175.34 127.58 183.58 87.48 193.73 87.48C203.88 87.48 212.12 127.58 212.12 176.97Z" id="hEn0I1kJa"></path></defs><g><g><use xlink:href="#hEn0I1kJa" opacity="1" fill="#18e6b3" fill-opacity="1"></use></g></g></svg>
-        <g id="coins"/>
-        <g id="monsters"/>
-        <g id="bullets"/>
-        <g id="monster_attacks"/>
-        <g id="player">
-          <!-- <circle cx="20" cy="20" r="20" style="fill:url(#player_color);stroke:black;stroke-width:2"/>
-          <ellipse cx="15" cy="15" rx="3" ry="6" style="fill:black"/>
-          <ellipse cx="25" cy="15" rx="3" ry="6" style="fill:black"/>
-          <path d="M10,25 l20,0 q0,8 -10,8 t-10,-8" style="fill:purple;stroke:black;stroke-black:2"/> -->
-          <!-- <image xlink:href="resources/charcter.png" height="40" width="40"/> -->
-          <svg id="Layer_1" enable-background="new 0 0 497 497" height="40" viewBox="0 0 497 497" width="40" xmlns="http://www.w3.org/2000/svg"><path d="m276.755 361.632h-15.827c9.055-8.439 35.533-33.114 44.511-41.481l-43.151-43.151-86.144 92.437c-4.369 4.71-7.008 11.04-6.924 17.971.175 14.337 11.94 25.818 26.277 25.643h25.307l-54.707 67.325c-3.295 4.055-2.991 9.944.703 13.638 3.689 3.689 9.567 3.998 13.622.716l111.222-90.003c5.336-4.363 8.862-11.039 8.952-18.47.164-13.33-10.511-24.462-23.841-24.625z" fill="#ffb357"/><path d="m130.819 344.704h-10.791c6.174-5.754 24.227-22.578 30.348-28.283l-29.42-29.421-58.735 63.025c-2.979 3.211-4.778 7.527-4.721 12.253.119 9.776 8.141 17.603 17.916 17.484h17.255l-37.3 45.903c-2.246 2.765-2.039 6.78.479 9.299 2.515 2.515 6.523 2.726 9.288.488l75.833-61.366c3.638-2.975 6.042-7.526 6.104-12.593.111-9.088-7.167-16.678-16.256-16.789z" fill="#fce3a0"/><path d="m397.612 341.807h-8.94c5.115-4.767 20.071-18.705 25.143-23.432l-24.375-24.375-48.661 52.215c-2.468 2.66-3.959 6.236-3.911 10.151.099 8.099 6.745 14.584 14.843 14.485h14.296l-30.903 38.03c-1.861 2.29-1.69 5.617.397 7.704 2.084 2.084 5.404 2.258 7.695.405l62.826-50.84c3.014-2.465 5.006-6.235 5.057-10.433.093-7.53-5.937-13.819-13.467-13.91z" fill="#fce3a0"/><path d="m295.88 4.914c-12.642-3.206-25.876-4.914-39.502-4.914-69.776 0-129.126 44.596-151.133 106.835v.007c-57.35.76-105.245 47.61-105.245 106.853 0 59.01 47.837 106.847 106.847 106.847h227.356z" fill="#b9bbbc"/><path d="m416.626 160.267c-.004-75.047-51.455-137.779-120.746-155.353-69.387 17.617-120.719 80.491-120.719 155.359 0 88.107 71.092 159.6 159.042 160.269h82.662c44.258 0 80.135-35.878 80.135-80.136 0-44.837-36.644-80.373-80.374-80.139z" fill="#d4d4d5"/><ellipse cx="199.471" cy="191.385" fill="#ff8e9e" rx="25.471" ry="20.283" transform="matrix(1 .003 -.003 1 .601 -.624)"/><ellipse cx="337.529" cy="191.817" fill="#ff8e9e" rx="25.471" ry="20.283" transform="matrix(-1 -.003 .003 -1 674.457 384.69)"/><g fill="#313d40"><path d="m204.5 152.042c-4.142 0-7.5 3.358-7.5 7.5v10c0 4.142 3.358 7.5 7.5 7.5s7.5-3.358 7.5-7.5v-10c0-4.142-3.358-7.5-7.5-7.5z"/><path d="m332.5 152.042c-4.142 0-7.5 3.358-7.5 7.5v10c0 4.142 3.358 7.5 7.5 7.5s7.5-3.358 7.5-7.5v-10c0-4.142-3.358-7.5-7.5-7.5z"/><path d="m218.745 134.425-12.99-7.5c-3.587-2.072-8.174-.843-10.245 2.745-2.071 3.587-.842 8.174 2.745 10.245l12.99 7.5c1.181.682 2.471 1.006 3.743 1.006 2.592 0 5.113-1.345 6.502-3.751 2.072-3.587.843-8.174-2.745-10.245z"/><path d="m341.49 129.67c-2.071-3.588-6.658-4.817-10.245-2.745l-12.99 7.5c-3.587 2.071-4.816 6.658-2.745 10.245 1.389 2.406 3.91 3.751 6.502 3.751 1.272 0 2.562-.324 3.743-1.006l12.99-7.5c3.588-2.071 4.817-6.658 2.745-10.245z"/><path d="m249.765 189.306c3.737 1.789 8.215.206 10.001-3.531 1.666-3.484 5.291-5.735 9.234-5.735s7.568 2.251 9.234 5.735c1.787 3.737 6.266 5.317 10.001 3.531 3.737-1.787 5.318-6.265 3.531-10.001-4.144-8.666-13.08-14.265-22.766-14.265s-18.623 5.599-22.766 14.265c-1.787 3.736-.206 8.214 3.531 10.001z"/></g></svg>
+  <g id="start">
+      <rect x="0" y="0" rx="10" ry="10" width="800" height="600" style="fill: black; stroke: rgb(170, 211, 148); stroke-width: 8"/>
+      <g id="button">
+        <g onclick="start_game()" transform="translate(320, 500)">
+          <rect x="0" y="0" rx="10" ry="10" width="160" height="60" style="fill:black;stroke:rgb(58, 188, 101);stroke-width:4"/>
+          <text x="75" y="40" style="fill:rgb(58, 188, 101);font-size:30px;text-anchor:middle;font-family: monospace">Play</text>
         </g>
       </g>
-    </g>
+      <text x="0" y="125" style="font-size: 55px; text-anchor: middle; font-family: monospace">
+        <tspan x="400" style="fill: rgb(58, 188, 101)">Ninja Stormy</tspan>
+      </text>
+      <text x="0" y="150" style="font-size: 14px; text-anchor: middle; font-family: monospace; fill: white">
+        <tspan x="400" dy="25">You are a Ninja with money problem. Your goal is to collect all</tspan>
+        <tspan x="400" dy="25">coins and fully pay off your bills</tspan>
+        <tspan x="400" dy="25">There will be monsters along the path who might attack you</tspan>
+        <tspan x="400" dy="25">Avoid them or shoot them with your nine shuriken to increase your score.</tspan>
+        <tspan x="400" dy="25" style="font-size: 12px">by LIU, Shih-Yang 20383290</tspan>
+      </text>
+      <rect x="260" y="300" rx="5" ry="5" width="270" height="170" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:1"/>
+      <text x="400" y="325" style="font-family: verdana; fill: white; font-size: 14px; text-anchor: middle; font-family: monospace">
+        <tspan style="font-size: 18px">Instructions</tspan>
+        <tspan x="400" dy="20">Move left: [A]</tspan>
+        <tspan x="400" dy="20">Move right: [D]</tspan>
+        <tspan x="400" dy="20">Jump: [W]</tspan>
+        <tspan x="400" dy="20">Shoot shuriken: [H]</tspan>
+        <tspan style="font-size: 12px" x="400" dy="20">Activate cheat mode: [C]</tspan>
+        <tspan style="font-size: 12px" x="400" dy="20">Deactivate cheat mode: [V]</tspan>
+      </text>
+  </g>
+	<g id="game_area" style="clip-path: url(#start_game)">
+      <rect width="100%" height="100%" style="fill:url(#background_pattern);stroke:rgb(170, 211, 148);stroke-width:8"/>
+      <rect x="20" y="20" width="600" height="560" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:3"/>
+      <g transform="translate(640, 40)">
+        <rect x="0" y="10" width="140" height="35" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:2"></rect>
+        <rect id="time_bar" x="0" y="10" width="120" height="35" style="fill:rgb(170, 211, 148)"></rect>
+        <text x="70" y="0" style="fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">Time</text>
+        <text id="time_left" x="70" y="36" style="fill:rgb(58, 188, 101);font-size:20px;text-anchor:middle;font-family:monospace">120</text>
+      </g>
+      <g transform="translate(640, 130)">
+        <text x="70" y="0" style="fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">Score</text>
+        <rect x="0" y="10" width="140" height="35" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:2"></rect>
+        <text id="score" x="70" y="36" style="fill:rgb(58, 188, 101);font-size:20px;text-anchor:middle;font-family:monospace">0</text>
+      </g>
+      <g transform="translate(640, 220)">
+        <text x="70" y="0" style="fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">shuriken</text>
+        <rect x="0" y="10" width="140" height="35" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:2"></rect>
+        <text id="candy_num" x="70" y="36" style="visibility:visible;fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">8</text>
+        <text id="cheat" x="70" y="36" style="visibility:hidden;fill:rgb(58, 188, 101);font-size:20px;text-anchor:middle;font-family:monospace">Infinite</text>
+      </g>
+      <g transform="translate(640, 310)">
+          <text x="70" y="0" style="fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">Level</text>
+          <rect x="0" y="10" width="140" height="35" style="fill:black;stroke:rgb(170, 211, 148);stroke-width:2"></rect>
+          <text id="level" x="70" y="36" style="visibility:visible;fill:rgb(58, 188, 101);font-size:25px;text-anchor:middle;font-family:monospace">1</text>
+        </g>
+      <g style="clip-path:url(#gameareaclip)">
+        <g transform="translate(20,20)">
+          <g id="gamearea" transform="translate(0,0)" width="600" height="560">
+            <rect x="0" y="0" width="600" height="560" style="fill:white" />
+          <g id="platforms">
+              <!-- Add your platforms here -->
+                <rect id ="moving_plat" style="fill:rgb(255, 170, 0)" width="80" height="20" x="520" y="100">
+                </rect>
+                <!-- 60 -->
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="0" y="60"/>
+
+                <!-- 80 -->
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="40" y="80"/>
+
+                <!-- 100 -->
+                <rect style="fill:rgb(255, 170, 0)" width="480" height="20" x="40" y="100"/>
+
+                <!-- 120 -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="60" y="120"/> -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="220" y="120"/> -->
+
+                <!-- 140 -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="220" y="140"/> -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="560" y="140"/> -->
+
+                <!-- 160 -->
+                <!-- <rect class="disappear" style="fill:rgb(65, 16, 65)" width="120" height="20" x="180" y="160"/> -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="540" y="160"/> -->
+
+                <!-- 180 -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="0" y="180"/> -->
+                <rect class = "gate" style="fill:rgb(0, 247, 255)" width="20" height="20" x="100" y="120"/>
+                <rect class = "gate" style="fill:rgb(0, 247, 255)" width="20" height="20" x="100" y="140"/>
+                <rect class = "gate" style="fill:rgb(0, 247, 255)" width="20" height="20" x="100" y="160"/>
+                <rect class = "gate" style="fill:rgb(0, 247, 255)" width="20" height="20" x="100" y="180"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="380" y="180"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="80" height="20" x="520" y="180"/> -->
+
+                <!-- 200 -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="0" y="200"/> -->
+                <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="80" y="200"/>
+                <rect style="fill:rgb(255, 170, 0)" width="80" height="20" x="360" y="200"/>
+
+                <!-- 220 -->
+                <rect style="fill:rgb(255, 170, 0)" width="160" height="20" x="0" y="220"/>
+                <rect style="fill:rgb(255, 170, 0)" width="140" height="20" x="320" y="220"/>
+
+                <!-- 240 -->
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="240" y="240"/> -->
+                <!-- <rect class="disappear" style="fill:rgb(65, 16, 65)" width="160" height="20" x="340" y="240"/> -->
+
+                <!-- 260 -->
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="220" y="260"/>
+
+                <!-- 280 -->
+                <rect style="fill:rgb(255, 170, 0)" width="100" height="20" x="200" y="280"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="560" y="280"/> -->
+
+                <!-- 300 -->
+                <rect style="fill:rgb(255, 170, 0)" width="100" height="20" x="120" y="300"/>
+                <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="280" y="300"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="100" height="20" x="500" y="300"/> -->
+
+                <!-- 320 -->
+                <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="0" y="320"/>
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="280" y="320"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="380" y="320"/>
+
+                <!-- 340 -->
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="0" y="340"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="320" y="340"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="380" y="340"/>
+
+                <!-- 360 -->
+                <rect style="fill:rgb(255, 170, 0)" width="120" height="20" x="0" y="360"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="320" y="360"/>
+                <rect style="fill:rgb(255, 170, 0)" width="120" height="20" x="380" y="360"/>
+
+                <!-- 380 -->
+                <rect style="fill:rgb(255, 170, 0)" width="100" height="20" x="0" y="380"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="220" y="380"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="580" y="380"/> -->
+
+                <!-- 400 -->
+                <rect style="fill:rgb(255, 170, 0)" width="80" height="20" x="180" y="400"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="560" y="400"/> -->
+
+                <!-- 420 -->
+                <rect style="fill:rgb(255, 170, 0)" width="200" height="20" x="160" y="420"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="540" y="420"/> -->
+
+                <!-- 440 -->
+                <rect style="fill:rgb(255, 170, 0)" width="100" height="20" x="140" y="440"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="440" y="440"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="500" y="440"/> -->
+
+                <!-- 460 -->
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="120" y="460"/>
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="400" y="460"/>
+
+                <!-- 480 -->
+                <rect style="fill:rgb(255, 170, 0)" width="40" height="20" x="0" y="480"/>
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="380" y="480"/>
+
+                <!-- 500 -->
+                <rect style="fill:rgb(255, 170, 0)" width="60" height="20" x="0" y="500"/>
+                <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="260" y="500"/>
+
+                <!-- 520 -->
+                <rect style="fill:rgb(255, 170, 0)" width="80" height="20" x="0" y="520"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="140" y="520"/> -->
+                <rect style="fill:rgb(255, 170, 0)" width="80" height="20" x="240" y="520"/>
+                <!-- <rect style="fill:rgb(255, 170, 0)" width="20" height="20" x="500" y="520"/> -->
+
+                <!-- the floor -->
+                <rect style="fill:rgb(255, 170, 0)" width="600" height="20" x="0" y="540"/>
+            </g>
+            <svg id = "treasure" x="20", y="180" height="40" viewBox="0 0 512.00003 512" width="40" xmlns="http://www.w3.org/2000/svg"><path d="m512 97.101562v8.828126h-512v-8.828126c-.015625-25.753906 10.210938-50.460937 28.425781-68.675781 18.214844-18.214843 42.921875-28.441406 68.675781-28.425781h317.796876c25.757812-.015625 50.460937 10.210938 68.675781 28.425781 18.214843 18.214844 28.441406 42.921875 28.425781 68.675781zm0 0" fill="#e57e25"/><path d="m61.792969 247.171875-61.792969-141.242187 255.699219-13.238282 256.300781 13.238282-61.792969 141.242187zm0 0" fill="#805333"/><path d="m99.035156 248.832031 28.691406-22.667969 17.371094 12.886719 7.179688 24.945313zm0 0" fill="#802f34"/><path d="m308.964844 247.171875h184.144531c4.882813.003906 9.546875 2.027344 12.890625 5.585937 3.34375 3.5625 5.066406 8.34375 4.765625 13.21875l-15.363281 229.515626c-.601563 9.265624-8.28125 16.480468-17.566406 16.507812h-443.671876c-9.285156-.027344-16.964843-7.242188-17.566406-16.507812l-15.363281-229.515626c-.300781-4.875 1.425781-9.65625 4.765625-13.21875 3.34375-3.558593 8.007812-5.582031 12.890625-5.585937zm0 0" fill="#f29c1f"/><path d="m212.234375 258.578125-8.671875-49.433594-14.652344-35.152343c19.136719-4.203126 38.671875-6.304688 58.261719-6.269532 11.570313-.023437 23.125.683594 34.605469 2.121094l24.714844 88.734375zm0 0" fill="#f3d55b"/><path d="m186.96875 218.746094-5.296875 28.425781h-42.726563l-9.445312-8.03125v-.089844l5.5625-29.925781 28.777344-10.152344 23.039062 19.773438zm0 0" fill="#cc4b4c"/><path d="m320 177.082031.089844-.355469.96875.621094zm0 0" fill="#804537"/><path d="m273.65625 300.136719c0 9.75-7.90625 17.65625-17.65625 17.65625s-17.65625-7.90625-17.65625-17.65625 7.90625-17.652344 17.65625-17.652344 17.65625 7.902344 17.65625 17.652344zm0 0" fill="#2c2f38"/><path d="m203.035156 247.171875v70.621094c0 29.253906 23.710938 52.964843 52.964844 52.964843s52.964844-23.710937 52.964844-52.964843v-70.621094zm52.964844 70.621094c-9.75 0-17.65625-7.90625-17.65625-17.65625s7.90625-17.652344 17.65625-17.652344 17.65625 7.902344 17.65625 17.652344c-.03125 9.738281-7.917969 17.628906-17.65625 17.65625zm0 0" fill="#f0c419"/><path d="m216.628906 353.101562h-156.511718l-2.914063-43.519531c-.171875-2.445312.683594-4.851562 2.355469-6.644531 1.675781-1.792969 4.019531-2.804688 6.472656-2.800781h137.003906v17.65625c-.03125 13.054687 4.820313 25.648437 13.59375 35.308593zm0 0" fill="#af8066"/><path d="m451.882812 353.101562-3.53125 52.96875h-384.703124l-3.53125-52.96875h156.511718c10.003906 11.234376 24.328125 17.65625 39.371094 17.65625s29.367188-6.421874 39.371094-17.65625zm0 0" fill="#805333"/><path d="m448.351562 406.070312-3 44.753907c-.324218 4.632812-4.183593 8.222656-8.828124 8.210937h-361.046876c-4.644531.011719-8.503906-3.578125-8.828124-8.210937l-3-44.753907zm0 0" fill="#af8066"/><path d="m454.796875 309.582031-2.914063 43.519531h-156.511718c8.773437-9.660156 13.625-22.253906 13.59375-35.308593v-17.65625h137.003906c2.453125-.003907 4.796875 1.007812 6.472656 2.800781 1.671875 1.792969 2.527344 4.199219 2.355469 6.644531zm0 0" fill="#af8066"/><path d="m150.070312 0c-36.988281 0-69.472656 11.828125-88.367187 35.308594-8.273437 10.203125-13.773437 22.363281-15.976563 35.3125-1.082031 5.820312-1.613281 11.734375-1.589843 17.65625v17.652344h-44.136719v-8.828126c-.015625-25.753906 10.210938-50.460937 28.425781-68.675781 18.214844-18.214843 42.921875-28.441406 68.675781-28.425781zm0 0" fill="#f0c419"/><path d="m512 97.101562v8.828126h-44.136719v-17.652344c.023438-5.921875-.507812-11.835938-1.589843-17.65625-2.203126-12.949219-7.703126-25.109375-15.976563-35.3125-18.894531-23.480469-51.378906-35.308594-88.367187-35.308594h52.96875c25.757812-.015625 50.460937 10.210938 68.675781 28.425781 18.214843 18.214844 28.441406 42.921875 28.425781 68.675781zm0 0" fill="#f0c419"/><path d="m467.863281 88.277344v17.652344h-423.726562v-17.652344c-.023438-5.921875.507812-11.835938 1.589843-17.65625h420.546876c1.082031 5.820312 1.613281 11.734375 1.589843 17.65625zm0 0" fill="#cb8252"/><path d="m466.273438 70.621094h-420.546876c2.203126-12.949219 7.703126-25.109375 15.976563-35.3125h388.59375c8.273437 10.203125 13.773437 22.363281 15.976563 35.3125zm0 0" fill="#af8066"/><path d="m256 344.277344c-4.875 0-8.828125-3.953125-8.828125-8.828125v-17.65625c0-4.875 3.953125-8.828125 8.828125-8.828125s8.828125 3.953125 8.828125 8.828125v17.65625c0 4.875-3.953125 8.828125-8.828125 8.828125zm0 0" fill="#2c2f38"/><path d="m428.226562 240.640625-40.605468-24.011719-11.035156-42.992187 6.796874 3.972656 33.71875 19.953125zm0 0" fill="#e64c3c"/><path d="m362.992188 165.605469-42.902344 11.121093-40.609375-24.007812 42.992187-11.035156 33.808594 19.949218zm0 0" fill="#cc4b4c"/><path d="m387.621094 216.628906-66.386719-39.195312-.175781-.085938-.96875-.621094 42.902344-11.121093h.085937l13.507813 8.03125zm0 0" fill="#fb7b76"/><path d="m320.089844 176.726562-.089844.355469-13.507812 70.089844h-14.476563l-10.238281-77.328125-2.296875-17.125zm0 0" fill="#ff5364"/><path d="m387.621094 216.628906-36.722656 30.542969h-44.40625l13.507812-70.089844 1.058594.265625.175781.085938zm0 0" fill="#cc4b4c"/><path d="m428.226562 240.640625-16.773437 6.53125h-60.554687l36.722656-30.542969zm0 0" fill="#802f34"/><path d="m225.457031 205.152344-7.769531 42.019531h-36.015625l5.296875-28.425781zm0 0" fill="#802f34"/><path d="m225.457031 205.152344-38.488281 13.59375h-.089844l-23.039062-19.773438 7.414062-40.074218 17.65625 15.09375zm0 0" fill="#e64c3c"/><path d="m171.253906 158.898438-7.414062 40.074218-28.777344 10.152344-30.984375-26.480469zm0 0" fill="#fb7b76"/><path d="m135.0625 209.125-5.5625 29.925781-22.949219 8.121094h-14.390625l6.089844-33.015625 5.828125-31.511719zm0 0" fill="#ff5364"/></svg>
+            <svg x="510", y ="-10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="119.81967213114747 74.32786885245892 103.99999999999999 12.984615384615381" width="100" height="30.98"><defs><path d="M220.82 79.82C220.82 82.3 198.42 84.31 170.82 84.31C143.22 84.31 120.82 82.3 120.82 79.82C120.82 77.34 143.22 75.33 170.82 75.33C198.42 75.33 220.82 77.34 220.82 79.82Z" id="bDjtJjUKg"></path></defs><g><g><use xlink:href="#bDjtJjUKg" opacity="1" fill="" fill-opacity="1"></use></g></g></svg>
+            <svg x="510", y ="-10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="119.81967213114747 74.32786885245892 103.99999999999999 12.984615384615381" width="100" height="30.98"><defs><path d="M220.82 79.82C220.82 82.3 198.42 84.31 170.82 84.31C143.22 84.31 120.82 82.3 120.82 79.82C120.82 77.34 143.22 75.33 170.82 75.33C198.42 75.33 220.82 77.34 220.82 79.82Z" id="bDjtJjUKg"></path></defs><g><g><use xlink:href="#bDjtJjUKg" opacity="1" fill="#29e37f" fill-opacity="1"></use></g></g></svg>
+            <svg x="-5", y="390" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="174.33653846153845 86.47596153846155 40.77884615384616 182.99038461538464" width="19.52" height="95"><defs><path d="M212.12 176.97C212.12 226.36 203.88 266.47 193.73 266.47C183.58 266.47 175.34 226.36 175.34 176.97C175.34 127.58 183.58 87.48 193.73 87.48C203.88 87.48 212.12 127.58 212.12 176.97Z" id="hEn0I1kJa"></path></defs><g><g><use xlink:href="#hEn0I1kJa" opacity="1" fill="#18e6b3" fill-opacity="1"></use></g></g></svg>
+            <g id="coins"/>
+            <g id="monsters"/>
+            <g id="bullets"/>
+            <g id="monster_attacks"/>
+            <g id="player_name"/>
+            <g id="player">
+              <!-- <circle cx="20" cy="20" r="20" style="fill:url(#player_color);stroke:black;stroke-width:2"/>
+              <ellipse cx="15" cy="15" rx="3" ry="6" style="fill:black"/>
+              <ellipse cx="25" cy="15" rx="3" ry="6" style="fill:black"/>
+              <path d="M10,25 l20,0 q0,8 -10,8 t-10,-8" style="fill:rgb(255, 170, 0);stroke:black;stroke-black:2"/> -->
+              <!-- <image xlink:href="resources/charcter.png" height="40" width="40"/> -->
+              <svg id="Layer_1" enable-background="new 0 0 497 497" height="35" viewBox="0 0 497 497" width="35" xmlns="http://www.w3.org/2000/svg"><path d="m276.755 361.632h-15.827c9.055-8.439 35.533-33.114 44.511-41.481l-43.151-43.151-86.144 92.437c-4.369 4.71-7.008 11.04-6.924 17.971.175 14.337 11.94 25.818 26.277 25.643h25.307l-54.707 67.325c-3.295 4.055-2.991 9.944.703 13.638 3.689 3.689 9.567 3.998 13.622.716l111.222-90.003c5.336-4.363 8.862-11.039 8.952-18.47.164-13.33-10.511-24.462-23.841-24.625z" fill="#ffb357"/><path d="m130.819 344.704h-10.791c6.174-5.754 24.227-22.578 30.348-28.283l-29.42-29.421-58.735 63.025c-2.979 3.211-4.778 7.527-4.721 12.253.119 9.776 8.141 17.603 17.916 17.484h17.255l-37.3 45.903c-2.246 2.765-2.039 6.78.479 9.299 2.515 2.515 6.523 2.726 9.288.488l75.833-61.366c3.638-2.975 6.042-7.526 6.104-12.593.111-9.088-7.167-16.678-16.256-16.789z" fill="#fce3a0"/><path d="m397.612 341.807h-8.94c5.115-4.767 20.071-18.705 25.143-23.432l-24.375-24.375-48.661 52.215c-2.468 2.66-3.959 6.236-3.911 10.151.099 8.099 6.745 14.584 14.843 14.485h14.296l-30.903 38.03c-1.861 2.29-1.69 5.617.397 7.704 2.084 2.084 5.404 2.258 7.695.405l62.826-50.84c3.014-2.465 5.006-6.235 5.057-10.433.093-7.53-5.937-13.819-13.467-13.91z" fill="#fce3a0"/><path d="m295.88 4.914c-12.642-3.206-25.876-4.914-39.502-4.914-69.776 0-129.126 44.596-151.133 106.835v.007c-57.35.76-105.245 47.61-105.245 106.853 0 59.01 47.837 106.847 106.847 106.847h227.356z" fill="#b9bbbc"/><path d="m416.626 160.267c-.004-75.047-51.455-137.779-120.746-155.353-69.387 17.617-120.719 80.491-120.719 155.359 0 88.107 71.092 159.6 159.042 160.269h82.662c44.258 0 80.135-35.878 80.135-80.136 0-44.837-36.644-80.373-80.374-80.139z" fill="#d4d4d5"/><ellipse cx="199.471" cy="191.385" fill="#ff8e9e" rx="25.471" ry="20.283" transform="matrix(1 .003 -.003 1 .601 -.624)"/><ellipse cx="337.529" cy="191.817" fill="#ff8e9e" rx="25.471" ry="20.283" transform="matrix(-1 -.003 .003 -1 674.457 384.69)"/><g fill="#313d40"><path d="m204.5 152.042c-4.142 0-7.5 3.358-7.5 7.5v10c0 4.142 3.358 7.5 7.5 7.5s7.5-3.358 7.5-7.5v-10c0-4.142-3.358-7.5-7.5-7.5z"/><path d="m332.5 152.042c-4.142 0-7.5 3.358-7.5 7.5v10c0 4.142 3.358 7.5 7.5 7.5s7.5-3.358 7.5-7.5v-10c0-4.142-3.358-7.5-7.5-7.5z"/><path d="m218.745 134.425-12.99-7.5c-3.587-2.072-8.174-.843-10.245 2.745-2.071 3.587-.842 8.174 2.745 10.245l12.99 7.5c1.181.682 2.471 1.006 3.743 1.006 2.592 0 5.113-1.345 6.502-3.751 2.072-3.587.843-8.174-2.745-10.245z"/><path d="m341.49 129.67c-2.071-3.588-6.658-4.817-10.245-2.745l-12.99 7.5c-3.587 2.071-4.816 6.658-2.745 10.245 1.389 2.406 3.91 3.751 6.502 3.751 1.272 0 2.562-.324 3.743-1.006l12.99-7.5c3.588-2.071 4.817-6.658 2.745-10.245z"/><path d="m249.765 189.306c3.737 1.789 8.215.206 10.001-3.531 1.666-3.484 5.291-5.735 9.234-5.735s7.568 2.251 9.234 5.735c1.787 3.737 6.266 5.317 10.001 3.531 3.737-1.787 5.318-6.265 3.531-10.001-4.144-8.666-13.08-14.265-22.766-14.265s-18.623 5.599-22.766 14.265c-1.787 3.736-.206 8.214 3.531 10.001z"/></g></svg>
+            </g>
+          </g>
+          <!--add your highscore table here-->
+          <g id="highscoretable" transform="translate(40,40)">
+              <rect width="520" height="480"
+                style="fill:white;stroke:rgb(58, 188, 101);stroke-width:2"/>
+              <text x="260" y="40"
+                style="fill:rgb(58, 188, 101);font-size:30px;font-weight:bold;text-anchor:middle">
+                High Score Table
+              </text>
+              <text id="highscoretext" y="45"
+                style="font-size: 20px;font-weight:bold"/>
+              <g id="button">
+                <g onclick="start_game()" transform="translate(210, 440)">
+                  <rect x="0" y="0" rx="10" ry="10" width="100" height="30" style="fill:black;stroke:rgb(58, 188, 101);stroke-width:4"/>
+                  <text x="50" y="20" style="fill:rgb(58, 188, 101);font-size:15px;text-anchor:middle;font-family: monospace">Play</text>
+                </g>
+              </g>
+          </g>
+        </g>
+      </g>
   </g>
 </svg>
 </body>

@@ -59,6 +59,59 @@
 //         }
 // }
 // The point and size class used in this program
+//
+// Below are constants used in the game
+//
+var PLAYER_SIZE = new Size(35, 35);         // The size of the player
+var SCREEN_SIZE = new Size(600, 560);       // The size of the game screen
+var PLAYER_INIT_POS  = new Point(0, 0); 
+var PLAYER_DIRECTION = "right";             // The initial position of the player
+var TIME_LEFT = 120;
+var MOVE_DISPLACEMENT = 5;                  // The speed of the player in motion
+var JUMP_SPEED = 8;                         // The speed of the player jumping
+var VERTICAL_DISPLACEMENT = 1;              // The displacement of vertical speed
+var MONSTER_SIZE = new Size(40, 40);        // The size of a monster
+var GAME_INTERVAL = 25;                     // The time interval of running the game
+var BULLET_SIZE = new Size(10, 10);         // The size of a bullet
+var BULLET_SPEED = 10.0;                    // The speed of a bullet
+                                            //  = pixels it moves each game loop
+var SHOOT_INTERVAL = 200.0;                 // The period when shooting is disabled
+var MONSTER_SHOOT_INTERVAL = 400.0;  
+var COIN_SIZE = new Size(20, 20);
+var NUMBER_OF_COINS = 8;
+var LEVEL = [4, 5, 6];
+
+//
+// Variables in the game
+//
+var timeleft = 0;
+var timeleftTimer = null;
+var nameShow = null; // The player name tag
+var flip = true;                            // A flag indicating the direction of the player
+var motionType = {NONE:0, LEFT:1, RIGHT:2}; // Motion enum
+var player = null;                          // The player object
+var gameInterval = null;                    // The interval
+var zoom = 1.0;                             // The zoom level of the screen
+var canShoot = true;                        // A flag indicating whether the player can shoot a bullet
+var MonstercanShoot = true;
+var BULLETS = [];
+var MONSTER_ATTACKS = [];
+var MONSTERS = [];
+var testing = 0;
+var name = "SeanThePlug's fan";
+var shoot_sound = document.getElementById("shoot");
+var background_sound = document.getElementById("background_music");
+var kill_sound = document.getElementById("kill");
+var lose_sound = document.getElementById("lose");
+var coin_sound = document.getElementById("coin_sound");
+var win_sound = document.getElementById("win");
+var current_level = 1;
+var lastTime = 0;
+var lastTime_disappear_platform = -1;
+var move_direction = 1;
+var score = 0;
+var current_coins = 0;
+
 function Point(x, y) {
     this.x = (x)? parseFloat(x) : 0.0;
     this.y = (y)? parseFloat(y) : 0.0;
@@ -74,9 +127,21 @@ function intersect(pos1, size1, pos2, size2) {
     return (pos1.x < pos2.x + size2.w && pos1.x + size1.w > pos2.x &&
             pos1.y < pos2.y + size2.h && pos1.y + size1.h > pos2.y);
 }
+function getUserName(){
+    name = prompt("Enter your player name", name);
+    player.name = name;
+    document.getElementById("name_value").firstChild.data = name;
+    nameShow = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    nameShow.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#name");
+    document.getElementById("player_name").appendChild(nameShow);
+    nameShow.setAttribute("y", player.position.y - 3);
+    nameShow.setAttribute("x", player.position.x + 5);
+}
+
 
 // The player class used in this program
 function Player() {
+    this.name = name;
     this.node = document.getElementById("player");
     this.position = PLAYER_INIT_POS;
     this.motion = motionType.NONE;
@@ -185,13 +250,13 @@ Player.prototype.collidePlatform = function(position) {
 }
 
 Player.prototype.collideScreen = function(position) {
-    if(position.x < 0 && position.y == 440 || position.y <10 && position.x > 520 ){
-        if(position.y == 440){
+    if(position.x < 0 && ( position.y <= 445 && position.y >= 400 ) || position.y <10 && position.x > 520 ){
+        if(position.y == 445){
             position.x = 540;
             position.y = 20;
         }else{
             position.x = 5;
-            position.y = 440;
+            position.y = 445;
         }
     }else{
         if (position.x < 0) position.x = 0;
@@ -206,47 +271,6 @@ Player.prototype.collideScreen = function(position) {
         }
     }
 }
-
-
-//
-// Below are constants used in the game
-//
-var PLAYER_SIZE = new Size(40, 40);         // The size of the player
-var SCREEN_SIZE = new Size(600, 560);       // The size of the game screen
-var PLAYER_INIT_POS  = new Point(0, 0); 
-var PLAYER_DIRECTION = "right";    // The initial position of the player
-
-var MOVE_DISPLACEMENT = 5;                  // The speed of the player in motion
-var JUMP_SPEED = 8;                        // The speed of the player jumping
-var VERTICAL_DISPLACEMENT = 1;              // The displacement of vertical speed
-
-var GAME_INTERVAL = 25;                     // The time interval of running the game
-var flip = true;                         // A flag indicating the direction of the player
-
-//
-// Variables in the game
-//
-var motionType = {NONE:0, LEFT:1, RIGHT:2}; // Motion enum
-
-var player = null;                          // The player object
-var gameInterval = null;                    // The interval
-var zoom = 1.0;                             // The zoom level of the screen
-
-var BULLET_SIZE = new Size(10, 10); // The size of a bullet
-var BULLET_SPEED = 10.0;            // The speed of a bullet
-                                    //  = pixels it moves each game loop
-var SHOOT_INTERVAL = 200.0;         // The period when shooting is disabled
-var MONSTER_SHOOT_INTERVAL = 400.0;  
-var canShoot = true;                // A flag indicating whether the player can shoot a bullet
-var MonstercanShoot = true;
-
-var BULLETS = [];
-var MONSTER_ATTACKS = [];
-var MONSTERS = [];
-var MONSTER_SIZE = new Size(40, 40); // The size of a monster
-var testing = 0;
-
-var COIN_SIZE = new Size(20, 20);
 
 function Monster(i){
     this.node = document.getElementById("monsters").childNodes.item(i);
@@ -286,7 +310,6 @@ function coin_collidePlatform(position){
     }
     return true;
 }
-
 // Should be executed after the page is loaded
 function load() {
     // createPlatforms();
@@ -294,12 +317,120 @@ function load() {
     document.addEventListener("keydown", keydown, false);
     document.addEventListener("keyup", keyup, false);
 
+}
+function count_down() {
+    timeleft--;
+    document.getElementById("time_left").firstChild.data = timeleft;
+    document.getElementById("time_bar").setAttribute("width", timeleft);
+    if (timeleft <= 0) {
+      lose_sound.play();
+      end_game();
+    }
+}
+function start_game() {
+    if(current_level > 3){
+        alert("you already finish all the level Reset the score")
+        score = 0;
+    }
+    if(current_level <2 ){
+        score = 0;
+    }
+    current_coins = 0;
+    var names = document.getElementById("player_name");
+    for (var i = 0; i < names.childNodes.length; i++) 
+    {
+        var name = names.childNodes.item(i);
+        names.removeChild(name);
+    }
+    document.getElementById("highscoretable").style.setProperty("visibility", "hidden", null);
+    //set Level
+    document.getElementById("level").firstChild.data = current_level;
+    //clearBullets
+    var bullets = document.getElementById("bullets");
+    for (var i = 0; i < bullets.childNodes.length; i++) {
+        var node = bullets.childNodes.item(i);
+        bullets.removeChild(node);
+        BULLETS.splice(i, 1);
+        i--;
+    }
+    var monster_attacks = document.getElementById("monster_attacks");
+    for (var i = 0; i < monster_attacks.childNodes.length; i++) {
+        var node = monster_attacks.childNodes.item(i);
+        monster_attacks.removeChild(node);
+        MONSTER_ATTACKS.splice(i,1);
+        i--;
+    }
+    BULLETS = [];
+    MONSTER_ATTACKS = [];
+    MONSTERS = [];
+    //clearMonsters
+    var monsters = document.getElementById("monsters");
+    for (var i = 0; i < monsters.childNodes.length; i++) 
+    {
+        var monster = monsters.childNodes.item(i);
+        monsters.removeChild(monster);
+        i--;
+    }
+    //claerCoins
+    var coins = document.getElementById("coins");
+    for (var i = 0; i < coins.childNodes.length; i++) 
+    {
+        var coin = coins.childNodes.item(i);
+        coins.removeChild(coin);
+        i--;
+    }
+    //clear the gate
+    var gate = document.getElementsByClassName("gate");
+    for(var i = 0; i< gate.length;i++){
+        gate[i].remove();
+        i--;
+    }
+    //set the gate
+    var platforms = document.getElementById("platforms");
+    for(var i = 0; i<4;i++){
+        var block_1 = document.createElementNS("http://www.w3.org/2000/svg","rect");
+        block_1.setAttribute("x", 100);
+        block_1.setAttribute("y", 120+i*20);
+        block_1.setAttribute("width",  20);
+        block_1.setAttribute("height", 20);
+        block_1.setAttribute("style", "fill:rgb(0, 247, 255)");
+        block_1.setAttribute("class","gate");
+        platforms.appendChild(block_1);
+    }
+    //clear the disappearing platform 
+    var disappearplatforms = document.getElementsByClassName("disappear");
+    for(var i = 0; i< disappearplatforms.length;i++){
+        disappearplatforms[i].remove();
+        i--;
+    }
+    //set the disappearing platform
+    var disappearplatforms_1 = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    disappearplatforms_1.setAttribute("x", 180);
+    disappearplatforms_1.setAttribute("y", 160);
+    disappearplatforms_1.setAttribute("width", 120);
+    disappearplatforms_1.setAttribute("height", 20);
+    disappearplatforms_1.setAttribute("style", "fill: rgb(65, 16, 65)");
+    disappearplatforms_1.setAttribute("class","disappear");
+    disappearplatforms_1.setAttribute("opacity", 1);
+    platforms.appendChild(disappearplatforms_1);
+    var disappearplatforms_2 = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    disappearplatforms_2.setAttribute("x", 340);
+    disappearplatforms_2.setAttribute("y", 240);
+    disappearplatforms_2.setAttribute("width", 160);
+    disappearplatforms_2.setAttribute("height", 20);
+    disappearplatforms_2.setAttribute("style", "fill: rgb(65, 16, 65)");
+    disappearplatforms_2.setAttribute("class","disappear");
+    disappearplatforms_2.setAttribute("opacity", 1);
+    platforms.appendChild(disappearplatforms_2);
+    //set the gate
+
+
     // Create the player
     player = new Player();
     //Create the coin
     var coin_create_counter = 0;
     var points = [];
-    while(coin_create_counter < 6){
+    while(coin_create_counter < NUMBER_OF_COINS){
         var x = Math.floor(Math.random() * 480) + 60;
         var y = Math.floor(Math.random() * 500) + 20;
         var point = new Point(x,y);
@@ -312,13 +443,52 @@ function load() {
         createCoin(points[i].x,points[i].y);
     }
     // Create the monsters
-    // for(var i = 0; i < 3; i++){
+    // for(var i = 0; i < LEVEL[current_level-1]; i++){
     //     createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
     //     MONSTERS.push(new Monster(i));
     // }
+        createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
+        MONSTERS.push(new Monster(0));
 
     // Start the game interval
+    getUserName();
+    clearInterval(gameInterval);
+    clearInterval(timeleftTimer);
+    background_sound.play();
+    timeleft = TIME_LEFT;
     gameInterval = setInterval("gamePlay()", GAME_INTERVAL);
+    timeleftTimer = setInterval("count_down()", 1000);
+}
+function end_game(){
+    background_sound.pause();
+    background_sound.currentTime = 0;
+    clearInterval(gameInterval);
+    clearInterval(timeleftTimer);
+    // Get the high score table from cookies
+    var highScoreTable = getHighScoreTable();
+
+    // // Create the new score record
+    var record = new ScoreRecord(player.name, score);
+
+    // // Insert the new score record
+    var position = 0;
+    while (position < highScoreTable.length) {
+        var curPositionScore = highScoreTable[position].score;
+        if (curPositionScore < score)
+            break;
+
+        position++;
+    }
+    if (position < 10)
+        highScoreTable.splice(position, 0, record);
+
+    // Store the new high score table
+    setHighScoreTable(highScoreTable);
+
+    // Show the high score table
+    showHighScoreTable(highScoreTable);
+
+    return;
 }
 function createCoin(x, y) {
     var coin = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -447,6 +617,7 @@ function keydown(evt) {
 		
 		case "H".charCodeAt(0): // spacebar = shoot
 			if (canShoot) {
+                shoot_sound.play();
                 shootBullet(PLAYER_DIRECTION);
             }
 			break;
@@ -477,6 +648,18 @@ function keyup(evt) {
 // This function checks collision
 //
 function collisionDetection() {
+    // Check if the player find the treasure
+    var treasure = document.getElementById("treasure")
+    var x = parseInt(treasure.getAttribute("x"));
+    var y = parseInt(treasure.getAttribute("y"));
+    if (intersect(new Point(x,y),new Size(40, 40),player.position, PLAYER_SIZE)) {
+        alert("win!!!!");
+        win_sound.play();
+        if (current_level<=3){
+            current_level++;
+        }
+        end_game();
+    }
     // Check whether the player collides with a monster
     var monsters = document.getElementById("monsters");
     for (var i = 0; i < monsters.childNodes.length; i++) {
@@ -485,8 +668,8 @@ function collisionDetection() {
         var y = parseInt(monster.getAttribute("y"));
 
         if (intersect(new Point(x, y), MONSTER_SIZE, player.position, PLAYER_SIZE)) {
-            alert("Game over! YOU GOT KILLED LOSER");
-            clearInterval(gameInterval);
+            lose_sound.play();
+            end_game();
         }
     }
     //check whether the player collides with a coin
@@ -497,21 +680,26 @@ function collisionDetection() {
         var y = parseInt(coin.getAttribute("y"));
 
         if (intersect(new Point(x, y), COIN_SIZE, player.position, PLAYER_SIZE)) {
+            score+=10;
+            current_coins++;
+            document.getElementById("score").firstChild.data = score;
+            coin_sound.play();
             coins.removeChild(coin);
             i--;
         }
     }
-    var monsters = document.getElementById("monsters");
-    for (var i = 0; i < monsters.childNodes.length; i++) {
-        var monster = monsters.childNodes.item(i);
-        var x = parseInt(monster.getAttribute("x"));
-        var y = parseInt(monster.getAttribute("y"));
+    // var monsters = document.getElementById("monsters");
+    // for (var i = 0; i < monsters.childNodes.length; i++) {
+    //     var monster = monsters.childNodes.item(i);
+    //     var x = parseInt(monster.getAttribute("x"));
+    //     var y = parseInt(monster.getAttribute("y"));
 
-        if (intersect(new Point(x, y), MONSTER_SIZE, player.position, PLAYER_SIZE)) {
-            alert("Game over! YOU GOT KILLED LOSER");
-            clearInterval(gameInterval);
-        }
-    }
+    //     if (intersect(new Point(x, y), MONSTER_SIZE, player.position, PLAYER_SIZE)) {
+    //         lose_sound.play();
+    //         alert("Game over! YOU GOT KILLED LOSER");
+    //         clearInterval(gameInterval);
+    //     }
+    // }
     var monster_attacks = document.getElementById("monster_attacks");
     for(var i = 0; i< monster_attacks.childNodes.length; i++){
         var monster_attack = monster_attacks.childNodes.item(i);
@@ -519,8 +707,8 @@ function collisionDetection() {
         var y = parseInt(monster_attack.getAttribute("y"));
 
         if (intersect(new Point(x, y), BULLET_SIZE, player.position, PLAYER_SIZE)) {
-            alert("Game over! YOU ARE KILL BY THE DIABLO");
-            clearInterval(gameInterval);
+            lose_sound.play();
+            end_game();
         }
     }
 
@@ -537,6 +725,9 @@ function collisionDetection() {
             var my = parseInt(monster.getAttribute("y"));
 
             if (intersect(new Point(x, y), BULLET_SIZE, new Point(mx, my), MONSTER_SIZE)) {
+                kill_sound.play();
+                score+=30;
+                document.getElementById("score").firstChild.data = score;
                 monsters.removeChild(monster);
                 MONSTERS.splice(j,1);
                 j--;
@@ -654,11 +845,19 @@ function move_platform(move_direction){
 //
 // This function updates the position and motion of the player in the system
 //
-var lastTime = 0;
-var lastTime_disappear_platform = -1;
-var move_direction = 1;
 
 function gamePlay() {
+    console.log(current_coins)
+    if(current_coins == NUMBER_OF_COINS){
+        var gate = document.getElementsByClassName("gate");
+        if(gate){
+            for(var i = 0; i<gate.length;i++){
+                gate[i].remove();
+                i--;
+            }
+        }
+    }
+    // console.log("x: "+player.position.x+" y: "+player.position.y);
     move_direction = move_platform(move_direction);
     var init_position = new Point();
     init_position.x = player.position.x;
@@ -782,7 +981,9 @@ function updateScreen() {
     }
     else {
         player.node.setAttribute("transform", "translate(" + (player.position.x + PLAYER_SIZE.w) + "," + player.position.y + ") scale(-1, 1)");
-    }  
+    }
+    nameShow.setAttribute("y", player.position.y - 3);
+    nameShow.setAttribute("x", player.position.x + 5);
     // Calculate the scaling and translation factors	
     
     // Add your code here
