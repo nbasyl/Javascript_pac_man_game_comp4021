@@ -122,6 +122,27 @@ Player.prototype.isOnDisappearPlatform = function() {
     return false;
 }
 
+Player.prototype.isOnVerticalPlatform = function() {
+    var node = document.getElementById("moving_plat");
+    var x = parseFloat(node.getAttribute("x"));
+    var y = parseFloat(node.getAttribute("y"));
+    var w = parseFloat(node.getAttribute("width"));
+    var h = parseFloat(node.getAttribute("height"));
+    // console.log(`Player x:${this.position.x} y:${this.position.y}`);
+    // console.log(`Platform x:${x} y:${y - PLAYER_SIZE.h}`);
+    if ((this.position.x + PLAYER_SIZE.w > x && this.position.x < x + w) && ((this.position.y + PLAYER_SIZE.h) < y + 1)){
+        if(this.position.y < y - PLAYER_SIZE.h-10)
+        {
+            return false;
+        }
+        this.position.y = y - PLAYER_SIZE.h -1;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 Player.prototype.collidePlatform = function(position) {
     var platforms = document.getElementById("platforms");
     for (var i = 0; i < platforms.childNodes.length; i++) {
@@ -135,6 +156,15 @@ Player.prototype.collidePlatform = function(position) {
         var h = parseFloat(node.getAttribute("height"));
         var pos = new Point(x, y);
         var size = new Size(w, h);
+        // if (node.getAttribute("id")=="moving_plat")
+        // {
+        //     if (intersect(position, PLAYER_SIZE, pos, size)) {
+        //         console.log(this.isOnVerticalPlatform());
+        //         position.x = this.position.x;
+        //         position.y = y - PLAYER_SIZE.h;
+        //     }
+        // }
+        var gang = this.isOnVerticalPlatform();
         if (intersect(position, PLAYER_SIZE, pos, size)) {
             position.x = this.position.x;
             if (intersect(position, PLAYER_SIZE, pos, size)) {
@@ -146,20 +176,22 @@ Player.prototype.collidePlatform = function(position) {
                 {
                     position.y = y - PLAYER_SIZE.h;
                 }
-                this.verticalSpeed = 0;
+                if(gang == false){
+                    this.verticalSpeed = 0;
+                }
             }
         }
     }
 }
 
 Player.prototype.collideScreen = function(position) {
-    if(position.x < 0 && (position.y == 180 || position.y == 440)){
-        if(position.y == 180){
-            position.x = -(position.x)+5;
-            position.y = 440;
+    if(position.x < 0 && position.y == 440 || position.y <10 && position.x > 520 ){
+        if(position.y == 440){
+            position.x = 540;
+            position.y = 20;
         }else{
-            position.x = -(position.x)+5;
-            position.y = 180;
+            position.x = 5;
+            position.y = 440;
         }
     }else{
         if (position.x < 0) position.x = 0;
@@ -185,11 +217,11 @@ var PLAYER_INIT_POS  = new Point(0, 0);
 var PLAYER_DIRECTION = "right";    // The initial position of the player
 
 var MOVE_DISPLACEMENT = 5;                  // The speed of the player in motion
-var JUMP_SPEED = 15;                        // The speed of the player jumping
+var JUMP_SPEED = 8;                        // The speed of the player jumping
 var VERTICAL_DISPLACEMENT = 1;              // The displacement of vertical speed
 
 var GAME_INTERVAL = 25;                     // The time interval of running the game
-
+var flip = true;                         // A flag indicating the direction of the player
 
 //
 // Variables in the game
@@ -220,55 +252,7 @@ function Monster(i){
     this.node = document.getElementById("monsters").childNodes.item(i);
     this.position = new Point(parseInt(this.node.getAttribute("x")),parseInt(this.node.getAttribute("y")));
     this.displacement = new Point(parseFloat(Math.random()*2),parseFloat(Math.random()*2));
-}
-Monster.prototype.isOnPlatform = function() {
-    var platforms = document.getElementById("platforms");
-    for (var i = 0; i < platforms.childNodes.length; i++) {
-        var node = platforms.childNodes.item(i);
-        if (node.nodeName != "rect") continue;
-
-        var x = parseFloat(node.getAttribute("x"));
-        var y = parseFloat(node.getAttribute("y"));
-        var w = parseFloat(node.getAttribute("width"));
-        var h = parseFloat(node.getAttribute("height"));
-
-        if (((this.position.x + MONSTER_SIZE.w > x && this.position.x < x + w) ||
-             ((this.position.x + MONSTER_SIZE.w) == x && this.motion == motionType.RIGHT) ||
-             (this.position.x == (x + w) && this.motion == motionType.LEFT)) &&
-            this.position.y + MONSTER_SIZE.h == y) return i+1;
-    }
-    if (this.position.y + MONSTER_SIZE.h == SCREEN_SIZE.h) return true;
-
-    return false;
-}
-Monster.prototype.collidePlatform = function(position) {
-    var platforms = document.getElementById("platforms");
-    for (var i = 0; i < platforms.childNodes.length; i++) {
-        var node = platforms.childNodes.item(i);
-        if (node.nodeName != "rect") continue;
-        // if (node.id = "moving_plat") continue;
-
-        var x = parseFloat(node.getAttribute("x"));
-        var y = parseFloat(node.getAttribute("y"));
-        var w = parseFloat(node.getAttribute("width"));
-        var h = parseFloat(node.getAttribute("height"));
-        var pos = new Point(x, y);
-        var size = new Size(w, h);
-        if (intersect(position, MONSTER_SIZE, pos, size)) {
-            position.x = this.position.x;
-            if (intersect(position, MONSTER_SIZE, pos, size)) {
-                if (this.position.y >= y + h)
-                {
-                    position.y = y + h;
-                }
-                else
-                {
-                    position.y = y - MONSTER_SIZE.h;
-                }
-                this.verticalSpeed = 0;
-            }
-        }
-    }
+    this.flip = true;
 }
 Monster.prototype.collideScreen = function(position) {
     if (position.x < 0) position.x = 0;
@@ -282,7 +266,6 @@ Monster.prototype.collideScreen = function(position) {
         this.verticalSpeed = 0;
     }
 }
-
 
 function coin_collidePlatform(position){
     var platforms = document.getElementById("platforms");
@@ -329,10 +312,10 @@ function load() {
         createCoin(points[i].x,points[i].y);
     }
     // Create the monsters
-    for(var i = 0; i < 3; i++){
-        createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
-        MONSTERS.push(new Monster(i));
-    }
+    // for(var i = 0; i < 3; i++){
+    //     createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
+    //     MONSTERS.push(new Monster(i));
+    // }
 
     // Start the game interval
     gameInterval = setInterval("gamePlay()", GAME_INTERVAL);
@@ -456,8 +439,9 @@ function keydown(evt) {
 		
 			
         case "W".charCodeAt(0):
-            if (player.isOnPlatform()) {
-                player.verticalSpeed = JUMP_SPEED;
+            if (player.isOnPlatform() || player.isOnVerticalPlatform()) {
+                console.log("jump key");
+                player.verticalSpeed = JUMP_SPEED+4;
             }
             break;
 		
@@ -588,6 +572,13 @@ function move_monster(monster){
     if (isNaN(y)) y = 0;
 
     x += monster.displacement.x;
+
+    if (monster.displacement.x > 0){
+        monster.flip = true;
+        object.setAttribute("transform", "translate(" + MONSTER_SIZE.w + ", 0) scale(-1, 1)");
+    }else if(monster.displacement.x < 0){
+        monster.flip = false;
+    }
     if (x < 0) {
         x = 0;
         monster.displacement.x = -monster.displacement.x;
@@ -614,11 +605,19 @@ function move_monster(monster){
     monster.position.y = y;
     object.setAttribute("x", x);
     object.setAttribute("y", y);
+    if(monster.flip){
+        object.setAttribute("transform", "translate(" + (monster.position.x*2 + MONSTER_SIZE.w) + "," + 0 + ") scale(-1, 1)");           
+    }else{
+        object.setAttribute("transform", "scale(1,1)");    
+    }
+    // if(direction_change == true){
+    //     object.setAttribute("transform", "translate(" + (monster.position.x*2 + MONSTER_SIZE.w) + "," + 0 + ") scale(-1, 1)");
+    // }
 
     // if(direction_change){
-    //     console.log("gg");
-    //     rotate = "rotate(" + 180 + "," + (x+OBJECT_WIDTH / 2.0) +"," + (y+OBJECT_HEIGHT / 2.0) + ")";
-    //     object.setAttribute("transform", rotate);
+    //     console.log("change direction");
+    //     object.setAttribute("transform", "translate(" + MONSTER_SIZE.w + ", 0) scale(-1, 1)");
+    //     object.setAttribute("transform", "translate(" + (monster.position.x + MONSTER_SIZE.w) + "," + monster.position.y + ") scale(-1, 1)");
     // }
 
 
@@ -629,15 +628,47 @@ function move_monster(monster){
 
     // object.setAttribute("transform", translate);
 }
+function move_platform(move_direction){
+    var node = document.getElementById("moving_plat");
+    var x = parseFloat(node.getAttribute("x"));
+    var y = parseFloat(node.getAttribute("y"));
+    var w = parseFloat(node.getAttribute("width"));
+    var h = parseFloat(node.getAttribute("height"));
+    var move;
+    if(y+h <= 520 && move_direction == 1){
+        move = y+move_direction;
+        node.setAttribute("y", `${move}`);
+    }else if(y > 100 && move_direction == -1 ){
+        move = y+move_direction;
+        node.setAttribute("y", `${move}`);
+    }else if(y+h > 520){
+        move_direction = -1;
+        node.setAttribute("y", `${520-h}`);
+    }else if(y <= 100){
+        move_direction = 1;
+        node.setAttribute("y", "101");
+    }
+    return move_direction;
+}
 
 //
 // This function updates the position and motion of the player in the system
 //
 var lastTime = 0;
 var lastTime_disappear_platform = -1;
+var move_direction = 1;
 
 function gamePlay() {
-    console.log(PLAYER_DIRECTION);
+    move_direction = move_platform(move_direction);
+    var init_position = new Point();
+    init_position.x = player.position.x;
+    init_position.y = player.position.y;
+
+    // Check collision with platforms and screen
+    var vertical_speed = player.verticalSpeed;
+    player.collidePlatform(init_position);
+    player.position = init_position;
+
     var isOnDisappearPlatform = player.isOnDisappearPlatform();
     if(isOnDisappearPlatform){
         var i =isOnDisappearPlatform-1;
@@ -664,6 +695,8 @@ function gamePlay() {
             node.setAttribute("fill-opacity","1");
         }
     }
+    var isOnVerticalPlatform = player.isOnVerticalPlatform();
+    // console.log(isOnVerticalPlatform);
     collisionDetection();
 	
     // Check whether the player is on a platform
@@ -671,30 +704,44 @@ function gamePlay() {
     // Update player position
     var displacement = new Point();
 
+
+
     // Move left or right
     if (player.motion == motionType.LEFT)
         {   
+            flip = true;
+            player.node.setAttribute("transform", "translate(" + PLAYER_SIZE.w + ", 0) scale(-1, 1)");
             displacement.x = -MOVE_DISPLACEMENT;
         }
     if (player.motion == motionType.RIGHT)
         {
+            flip = false;
             displacement.x = MOVE_DISPLACEMENT;
         }
 
-    // Fall
-    if (!isOnPlatform && player.verticalSpeed <= 0) {
-        displacement.y = -player.verticalSpeed;
-        player.verticalSpeed -= VERTICAL_DISPLACEMENT;
-    }
+    if (isOnVerticalPlatform){
+        if (player.verticalSpeed > 0 ) {
 
-    // Jump
-    if (player.verticalSpeed > 0) {
-        displacement.y = -player.verticalSpeed;
-        player.verticalSpeed -= VERTICAL_DISPLACEMENT;
-        if (player.verticalSpeed <= 0)
-            player.verticalSpeed = 0;
+            displacement.y = -player.verticalSpeed;
+            player.verticalSpeed -= VERTICAL_DISPLACEMENT;
+            if (player.verticalSpeed <= 0)
+                player.verticalSpeed = 0;
+        }
     }
-
+    else{
+        // Fall
+        if (!isOnPlatform && player.verticalSpeed <= 0) {
+            displacement.y = -player.verticalSpeed;
+            player.verticalSpeed -= VERTICAL_DISPLACEMENT;
+        }
+        // Jump
+        if (player.verticalSpeed > 0) {
+            displacement.y = -player.verticalSpeed;
+            player.verticalSpeed -= VERTICAL_DISPLACEMENT;
+            if (player.verticalSpeed <= 0)
+                player.verticalSpeed = 0;
+        }
+    }
     // Get the new position of the player
     var position = new Point();
     position.x = player.position.x + displacement.x;
@@ -707,13 +754,15 @@ function gamePlay() {
     // Set the location back to the player object (before update the screen)
     player.position = position;
     if(MonstercanShoot){
-        Monster_shootBullet(0);
+        var monsters = document.getElementById("monsters");
+        if(monsters.childNodes.length > 0 ){
+            Monster_shootBullet(0);
+        }
     }
     for(var i = 0; i< MONSTERS.length; i++){
         var monster = MONSTERS[i];
         move_monster(monster);
     }
-
     move_monster_attacks();
     moveBullets();
     updateScreen();
@@ -727,8 +776,13 @@ function gamePlay() {
 //
 function updateScreen() {
     // Transform the player
-    player.node.setAttribute("transform", "translate(" + player.position.x + "," + player.position.y + ")");
-            
+  // Transform the player
+    if (!flip) {
+        player.node.setAttribute("transform", "translate(" + player.position.x + "," + player.position.y + ")");
+    }
+    else {
+        player.node.setAttribute("transform", "translate(" + (player.position.x + PLAYER_SIZE.w) + "," + player.position.y + ") scale(-1, 1)");
+    }  
     // Calculate the scaling and translation factors	
     
     // Add your code here
