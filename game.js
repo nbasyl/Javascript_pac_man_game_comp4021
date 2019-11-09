@@ -75,11 +75,12 @@ var GAME_INTERVAL = 25;                     // The time interval of running the 
 var BULLET_SIZE = new Size(10, 10);         // The size of a bullet
 var BULLET_SPEED = 10.0;                    // The speed of a bullet
                                             //  = pixels it moves each game loop
-var SHOOT_INTERVAL = 200.0;                 // The period when shooting is disabled
-var MONSTER_SHOOT_INTERVAL = 400.0;  
+var SHOOT_INTERVAL = 500.0;                 // The period when shooting is disabled
+var MONSTER_SHOOT_INTERVAL = 800.0;  
 var COIN_SIZE = new Size(20, 20);
 var NUMBER_OF_COINS = 8;
-var LEVEL = [4, 5, 6];
+var LEVEL = [4, 8, 12];
+var BULLET_AMOUNTS = 8;
 
 //
 // Variables in the game
@@ -98,7 +99,7 @@ var BULLETS = [];
 var MONSTER_ATTACKS = [];
 var MONSTERS = [];
 var testing = 0;
-var name = "SeanThePlug's fan";
+var name = "No Name";
 var shoot_sound = document.getElementById("shoot");
 var background_sound = document.getElementById("background_music");
 var kill_sound = document.getElementById("kill");
@@ -111,6 +112,9 @@ var lastTime_disappear_platform = -1;
 var move_direction = 1;
 var score = 0;
 var current_coins = 0;
+var winning = true;
+var cheat_mode = false;
+var current_bullet_amount = 0;
 
 function Point(x, y) {
     this.x = (x)? parseFloat(x) : 0.0;
@@ -307,6 +311,10 @@ function coin_collidePlatform(position){
         if (intersect(position, COIN_SIZE, pos, size)) {
             return false;
         }
+        // prevent coin to be spawned in the exit place
+        if (intersect(position, COIN_SIZE, new Point(0, 60) , new Size(120, 160))){
+            return false; 
+        }
     }
     return true;
 }
@@ -324,17 +332,15 @@ function count_down() {
     document.getElementById("time_bar").setAttribute("width", timeleft);
     if (timeleft <= 0) {
       lose_sound.play();
+      winning = false;
       end_game();
     }
 }
 function start_game() {
-    if(current_level > 3){
-        alert("you already finish all the level Reset the score")
-        score = 0;
-    }
-    if(current_level <2 ){
-        score = 0;
-    }
+    current_bullet_amount = BULLET_AMOUNTS;
+    //CLEAR BULLET DISPLAY
+    document.getElementById("shuriken").firstChild.data = current_bullet_amount;
+
     current_coins = 0;
     var names = document.getElementById("player_name");
     for (var i = 0; i < names.childNodes.length; i++) 
@@ -343,8 +349,6 @@ function start_game() {
         names.removeChild(name);
     }
     document.getElementById("highscoretable").style.setProperty("visibility", "hidden", null);
-    //set Level
-    document.getElementById("level").firstChild.data = current_level;
     //clearBullets
     var bullets = document.getElementById("bullets");
     for (var i = 0; i < bullets.childNodes.length; i++) {
@@ -427,6 +431,25 @@ function start_game() {
 
     // Create the player
     player = new Player();
+    console.log(current_level);
+    if(winning == false){
+        current_level = 1;
+    }
+    if( current_level > 3){
+        alert("you already finish all the level Reset the score and level")
+        getUserName();
+        current_level = 1;
+        score = 0;
+        document.getElementById("score").firstChild.data = score;
+    }
+    else if( current_level == 1 ){
+        getUserName();
+        score = 0;
+        document.getElementById("score").firstChild.data = score;
+    }
+    else{
+        alert(`you finish level ${current_level-1} Ready for the next challenge?`)
+    }
     //Create the coin
     var coin_create_counter = 0;
     var points = [];
@@ -442,16 +465,18 @@ function start_game() {
     for(var i =0; i<points.length;i++){
         createCoin(points[i].x,points[i].y);
     }
-    // Create the monsters
-    // for(var i = 0; i < LEVEL[current_level-1]; i++){
-    //     createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
-    //     MONSTERS.push(new Monster(i));
-    // }
-        createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
-        MONSTERS.push(new Monster(0));
 
+    // Create the monsters
+    createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20, true);
+    MONSTERS.push(new Monster(0));
+    for(var i = 1; i < LEVEL[current_level-1]; i++){
+        createMonster(Math.floor(Math.random() * 480) + 60, Math.floor(Math.random() * 500) + 20);
+        MONSTERS.push(new Monster(i));
+    }
+    //set Level
+    document.getElementById("level").firstChild.data = current_level;
     // Start the game interval
-    getUserName();
+    winning = true;
     clearInterval(gameInterval);
     clearInterval(timeleftTimer);
     background_sound.play();
@@ -464,31 +489,44 @@ function end_game(){
     background_sound.currentTime = 0;
     clearInterval(gameInterval);
     clearInterval(timeleftTimer);
-    // Get the high score table from cookies
-    var highScoreTable = getHighScoreTable();
 
-    // // Create the new score record
-    var record = new ScoreRecord(player.name, score);
 
-    // // Insert the new score record
-    var position = 0;
-    while (position < highScoreTable.length) {
-        var curPositionScore = highScoreTable[position].score;
-        if (curPositionScore < score)
-            break;
+    if(winning == false || current_level == 4){
+        //claen the high score table first
+        var oldhighscoretable = document.getElementById("highscoretext")
+        for(var i = 0; i<oldhighscoretable.childNodes.length;i++){
+            oldhighscoretable.childNodes.item(i).remove();
+            i--;
+        }
+        // Get the high score table from cookies
 
-        position++;
+        var highScoreTable = getHighScoreTable();
+        // // Create the new score record
+        var record = new ScoreRecord(player.name, score);
+
+        // // Insert the new score record
+        var position = 0;
+        while (position < highScoreTable.length) {
+            var curPositionScore = highScoreTable[position].score;
+            if (curPositionScore < score)
+                break;
+
+            position++;
+        }
+        if (position < 10)
+            highScoreTable.splice(position, 0, record);
+        // Store the new high score table
+        setHighScoreTable(highScoreTable);
+
+        // Show the high score table
+        showHighScoreTable(highScoreTable);
+        return;
     }
-    if (position < 10)
-        highScoreTable.splice(position, 0, record);
-
-    // Store the new high score table
-    setHighScoreTable(highScoreTable);
-
-    // Show the high score table
-    showHighScoreTable(highScoreTable);
-
-    return;
+    if(winning){
+        score = score + (current_level-1)*100 + timeleft*5;
+        document.getElementById("score").firstChild.data = score;
+    }
+    start_game();
 }
 function createCoin(x, y) {
     var coin = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -500,10 +538,13 @@ function createCoin(x, y) {
 //
 // This function creates the monsters in the game
 //
-function createMonster(x, y) {
+function createMonster(x, y, can_shoot) {
     var monster = document.createElementNS("http://www.w3.org/2000/svg", "use");
     monster.setAttribute("x", x);
     monster.setAttribute("y", y);
+    if(can_shoot){
+        monster.setAttribute("id", "monster_shoot")
+    }
     monster.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#monster");
     document.getElementById("monsters").appendChild(monster);
 }
@@ -546,22 +587,25 @@ function Monster_shootBullet(i){
 //
 function moveBullets() {
     // Go through all bullets
+    console.log(BULLETS)
     var bullets = document.getElementById("bullets");
     for (var i = 0; i < bullets.childNodes.length; i++) {
         var node = bullets.childNodes.item(i);
         // Update the position of the bullet
         var x = parseInt(node.getAttribute("x"));
         if(BULLETS[i]=="right"){
+            console.log("right shoot")
             node.setAttribute("x", x + BULLET_SPEED);
         }else if(BULLETS[i]=="left"){
+            console.log("left shoot")
             node.setAttribute("x", x - BULLET_SPEED);
         }
 
         // If the bullet is not inside the screen delete it from the group
-        if (x > SCREEN_SIZE.w) {
+        if (x > SCREEN_SIZE.w || x < 0) {
+            console.log("delete")
             bullets.removeChild(node);
             BULLETS.splice(i, 1);
-            i--;
         }
     }
 }
@@ -579,7 +623,7 @@ function move_monster_attacks() {
             node.setAttribute("x", x - BULLET_SPEED);
         }
         // If the bullet is not inside the screen delete it from the group
-        if (x > SCREEN_SIZE.w) {
+        if (x > SCREEN_SIZE.w || x < 0) {
             monster_attacks.removeChild(node);
             MONSTER_ATTACKS.splice(i,1);
             i--;
@@ -606,7 +650,20 @@ function keydown(evt) {
 			
 
         // Add your code here
-		
+        case "C".charCodeAt(0):
+                cheat_mode = true;
+                document.getElementById("shuriken").style.setProperty("visibility", "hidden", null);
+                document.getElementById("cheat").style.setProperty("visibility", "visible", null);
+                document.getElementById("player").setAttribute("opacity", "0.5");
+
+            break;
+        case "V".charCodeAt(0):
+                cheat_mode = false;
+                document.getElementById("cheat").style.setProperty("visibility", "hidden", null);
+                document.getElementById("shuriken").style.setProperty("visibility", "visible", null);
+                document.getElementById("player").setAttribute("opacity", "1");
+            break;
+            
 			
         case "W".charCodeAt(0):
             if (player.isOnPlatform() || player.isOnVerticalPlatform()) {
@@ -615,10 +672,20 @@ function keydown(evt) {
             }
             break;
 		
-		case "H".charCodeAt(0): // spacebar = shoot
-			if (canShoot) {
+        case "H".charCodeAt(0): // spacebar = shoot
+            if(canShoot && cheat_mode == true){
+                console.log("cheat shoot");
                 shoot_sound.play();
                 shootBullet(PLAYER_DIRECTION);
+            }
+			else if (canShoot && current_bullet_amount >= 1) {
+                console.log("normal shoot");
+                shoot_sound.play();
+                shootBullet(PLAYER_DIRECTION);
+                if(cheat_mode == false ){
+                    current_bullet_amount--;
+                    document.getElementById("shuriken").firstChild.data = current_bullet_amount;
+                }
             }
 			break;
     }
@@ -662,14 +729,17 @@ function collisionDetection() {
     }
     // Check whether the player collides with a monster
     var monsters = document.getElementById("monsters");
-    for (var i = 0; i < monsters.childNodes.length; i++) {
-        var monster = monsters.childNodes.item(i);
-        var x = parseInt(monster.getAttribute("x"));
-        var y = parseInt(monster.getAttribute("y"));
+    if(cheat_mode == false){
+        for (var i = 0; i < monsters.childNodes.length; i++) {
+            var monster = monsters.childNodes.item(i);
+            var x = parseInt(monster.getAttribute("x"));
+            var y = parseInt(monster.getAttribute("y"));
 
-        if (intersect(new Point(x, y), MONSTER_SIZE, player.position, PLAYER_SIZE)) {
-            lose_sound.play();
-            end_game();
+            if (intersect(new Point(x, y), MONSTER_SIZE, player.position, PLAYER_SIZE)) {
+                lose_sound.play();
+                winning = false;
+                end_game();
+            }
         }
     }
     //check whether the player collides with a coin
@@ -700,15 +770,18 @@ function collisionDetection() {
     //         clearInterval(gameInterval);
     //     }
     // }
-    var monster_attacks = document.getElementById("monster_attacks");
-    for(var i = 0; i< monster_attacks.childNodes.length; i++){
-        var monster_attack = monster_attacks.childNodes.item(i);
-        var x = parseInt(monster_attack.getAttribute("x"));
-        var y = parseInt(monster_attack.getAttribute("y"));
-
-        if (intersect(new Point(x, y), BULLET_SIZE, player.position, PLAYER_SIZE)) {
-            lose_sound.play();
-            end_game();
+    if (cheat_mode == false){
+        var monster_attacks = document.getElementById("monster_attacks");
+        for(var i = 0; i< monster_attacks.childNodes.length; i++){
+            var monster_attack = monster_attacks.childNodes.item(i);
+            var x = parseInt(monster_attack.getAttribute("x"));
+            var y = parseInt(monster_attack.getAttribute("y"));
+    
+            if (intersect(new Point(x, y), BULLET_SIZE, player.position, PLAYER_SIZE)) {
+                lose_sound.play();
+                winning = false;
+                end_game();
+            }
         }
     }
 
@@ -731,6 +804,7 @@ function collisionDetection() {
                 monsters.removeChild(monster);
                 MONSTERS.splice(j,1);
                 j--;
+                BULLETS.splice(i, 1);
                 bullets.removeChild(bullet);
                 i--;
             }
@@ -847,7 +921,7 @@ function move_platform(move_direction){
 //
 
 function gamePlay() {
-    console.log(current_coins)
+    // console.log(PLAYER_DIRECTION);
     if(current_coins == NUMBER_OF_COINS){
         var gate = document.getElementsByClassName("gate");
         if(gate){
@@ -953,8 +1027,8 @@ function gamePlay() {
     // Set the location back to the player object (before update the screen)
     player.position = position;
     if(MonstercanShoot){
-        var monsters = document.getElementById("monsters");
-        if(monsters.childNodes.length > 0 ){
+        var monster = document.getElementById("monster_shoot");
+        if(monster){
             Monster_shootBullet(0);
         }
     }
