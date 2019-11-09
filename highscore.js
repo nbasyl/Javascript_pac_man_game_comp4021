@@ -13,7 +13,7 @@ function ScoreRecord(name, score) {
 function getHighScoreTable() {
     var table = new Array();
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 5; i++) {
         // Contruct the cookie name
         var name = "player" + i;
 
@@ -39,7 +39,7 @@ function getHighScoreTable() {
 // This function stores the high score table to the cookies
 //
 function setHighScoreTable(table) {
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 5; i++) {
         // If i is more than the length of the high score table exit
         // from the for loop
         if (i >= table.length) break;
@@ -67,15 +67,19 @@ function clearHighScoreTable() {
 //
 // This function adds a high score entry to the text node
 //
-function addHighScore(record, node) {
+function addHighScore(record, node, player_top5 = false) {
     // Create the name text span
     var name = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
 
     // Set the attributes and create the text
     name.setAttribute("x", 100);
     name.setAttribute("dy", 40);
+    if(player_top5 == true){
+        name.setAttribute("fill", "rgb(244, 255, 124)")
+    }else{
+        name.setAttribute("fill", "rgb(58, 188, 101)")
+    }
     name.appendChild(document.createTextNode(record.name));
-
     // Add the name to the text node
     node.appendChild(name);
 
@@ -85,7 +89,11 @@ function addHighScore(record, node) {
     // Set the attributes and create the text
     score.setAttribute("x", 400);
     score.appendChild(document.createTextNode(record.score));
-
+    if(player_top5 == true){
+        score.setAttribute("fill", "rgb(244, 255, 124)")
+    }else{
+        score.setAttribute("fill", "rgb(58, 188, 101)")
+    }
     // Add the name to the text node
     node.appendChild(score);
 }
@@ -94,7 +102,7 @@ function addHighScore(record, node) {
 //
 // This function shows the high score table to SVG 
 //
-function showHighScoreTable(table) {
+function showHighScoreTable(table, TOP5, index) {
     // Show the table
     var node = document.getElementById("highscoretable");
     node.style.setProperty("visibility", "visible", null);
@@ -102,13 +110,18 @@ function showHighScoreTable(table) {
     // Get the high score text node
     var node = document.getElementById("highscoretext");
     
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 5; i++) {
         // If i is more than the length of the high score table exit
         // from the for loop
         if (i >= table.length) break;
 
-        // Add the record at the end of the text node
-        addHighScore(table[i], node);
+        if(TOP5 == true && i == index){
+            // Add the record at the end of the text node
+            addHighScore(table[i], node, TOP5);
+        }else{
+            // Add the record at the end of the text node
+            addHighScore(table[i], node);
+        }
     }
 }
 

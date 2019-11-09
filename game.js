@@ -70,7 +70,7 @@ var TIME_LEFT = 120;
 var MOVE_DISPLACEMENT = 5;                  // The speed of the player in motion
 var JUMP_SPEED = 8;                         // The speed of the player jumping
 var VERTICAL_DISPLACEMENT = 1;              // The displacement of vertical speed
-var MONSTER_SIZE = new Size(40, 40);        // The size of a monster
+var MONSTER_SIZE = new Size(28, 28);        // The size of a monster
 var GAME_INTERVAL = 25;                     // The time interval of running the game
 var BULLET_SIZE = new Size(10, 10);         // The size of a bullet
 var BULLET_SPEED = 10.0;                    // The speed of a bullet
@@ -106,6 +106,7 @@ var kill_sound = document.getElementById("kill");
 var lose_sound = document.getElementById("lose");
 var coin_sound = document.getElementById("coin_sound");
 var win_sound = document.getElementById("win");
+var teleport_sound = document.getElementById("teleport_sound");
 var current_level = 1;
 var lastTime = 0;
 var lastTime_disappear_platform = -1;
@@ -256,9 +257,11 @@ Player.prototype.collidePlatform = function(position) {
 Player.prototype.collideScreen = function(position) {
     if(position.x < 0 && ( position.y <= 445 && position.y >= 400 ) || position.y <10 && position.x > 520 ){
         if(position.y == 445){
+            teleport_sound.play();
             position.x = 540;
             position.y = 20;
         }else{
+            teleport_sound.play();
             position.x = 5;
             position.y = 445;
         }
@@ -397,7 +400,7 @@ function start_game() {
         block_1.setAttribute("y", 120+i*20);
         block_1.setAttribute("width",  20);
         block_1.setAttribute("height", 20);
-        block_1.setAttribute("style", "fill:rgb(0, 247, 255)");
+        block_1.setAttribute("style", "fill:rgb(255, 238, 0)");
         block_1.setAttribute("class","gate");
         platforms.appendChild(block_1);
     }
@@ -513,13 +516,17 @@ function end_game(){
 
             position++;
         }
-        if (position < 10)
+        if (position < 5){
             highScoreTable.splice(position, 0, record);
+            var top_5 = true;
+        }else{
+            alert(`Sorry your score is not high enough to make it into top 5 list! Your score ${score}`)
+        }
         // Store the new high score table
         setHighScoreTable(highScoreTable);
 
         // Show the high score table
-        showHighScoreTable(highScoreTable);
+        showHighScoreTable(highScoreTable, top_5, position );
         return;
     }
     if(winning){
@@ -664,6 +671,9 @@ function keydown(evt) {
                 document.getElementById("player").setAttribute("opacity", "1");
             break;
             
+        case "L".charCodeAt(0):
+                clearHighScoreTable();
+        break;
 			
         case "W".charCodeAt(0):
             if (player.isOnPlatform() || player.isOnVerticalPlatform()) {
@@ -720,8 +730,8 @@ function collisionDetection() {
     var x = parseInt(treasure.getAttribute("x"));
     var y = parseInt(treasure.getAttribute("y"));
     if (intersect(new Point(x,y),new Size(40, 40),player.position, PLAYER_SIZE)) {
-        alert("win!!!!");
         win_sound.play();
+        alert("win!!!!");
         if (current_level<=3){
             current_level++;
         }
